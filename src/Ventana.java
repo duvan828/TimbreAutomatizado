@@ -1,23 +1,23 @@
-
 import javax.swing.JCheckBox;
+import com.panamahitek.PanamaHitek_Arduino;
+import com.panamahitek.ArduinoException;
+import javax.swing.JOptionPane;
+import jssc.SerialPortException;
 
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-
-/**
- *
- * @author Lenovo
- */
 public class Ventana extends javax.swing.JFrame {
 
-    /**
-     * Creates new form Ventana
-     */
+    PanamaHitek_Arduino ino = new PanamaHitek_Arduino();
     public Ventana() {
         initComponents();
+        conexionArduino();
+    }
+    
+    private void conexionArduino(){
+        try {
+            ino.arduinoTX("COM10", 9600);
+        } catch (ArduinoException e) {
+            JOptionPane.showMessageDialog(null, e, "Error", JOptionPane.ERROR_MESSAGE);
+        }
     }
 
     private void notCheckAll(JCheckBox ch){
@@ -54,8 +54,8 @@ public class Ventana extends javax.swing.JFrame {
         jTextArea1 = new javax.swing.JTextArea();
         jButton4 = new javax.swing.JButton();
         jPanel3 = new javax.swing.JPanel();
-        jButton2 = new javax.swing.JButton();
-        jButton3 = new javax.swing.JButton();
+        back = new javax.swing.JButton();
+        up = new javax.swing.JButton();
         jPanel4 = new javax.swing.JPanel();
         jSeparator2 = new javax.swing.JSeparator();
         jLabel2 = new javax.swing.JLabel();
@@ -253,21 +253,31 @@ public class Ventana extends javax.swing.JFrame {
         jPanel3.setBackground(new java.awt.Color(1, 39, 65));
         jPanel3.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
-        jButton2.setBackground(new java.awt.Color(219, 24, 41));
-        jButton2.setFont(new java.awt.Font("Segoe UI Light", 1, 12)); // NOI18N
-        jButton2.setForeground(new java.awt.Color(255, 255, 255));
-        jButton2.setText("APAGAR");
-        jButton2.setBorder(null);
-        jButton2.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
-        jPanel3.add(jButton2, new org.netbeans.lib.awtextra.AbsoluteConstraints(410, 10, 80, 40));
+        back.setBackground(new java.awt.Color(219, 24, 41));
+        back.setFont(new java.awt.Font("Segoe UI Light", 1, 12)); // NOI18N
+        back.setForeground(new java.awt.Color(255, 255, 255));
+        back.setText("APAGAR");
+        back.setBorder(null);
+        back.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        back.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                backActionPerformed(evt);
+            }
+        });
+        jPanel3.add(back, new org.netbeans.lib.awtextra.AbsoluteConstraints(410, 10, 80, 40));
 
-        jButton3.setBackground(new java.awt.Color(63, 188, 78));
-        jButton3.setFont(new java.awt.Font("Segoe UI Light", 1, 12)); // NOI18N
-        jButton3.setForeground(new java.awt.Color(255, 255, 255));
-        jButton3.setText("ENCENDER");
-        jButton3.setBorder(null);
-        jButton3.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
-        jPanel3.add(jButton3, new org.netbeans.lib.awtextra.AbsoluteConstraints(310, 10, 90, 40));
+        up.setBackground(new java.awt.Color(63, 188, 78));
+        up.setFont(new java.awt.Font("Segoe UI Light", 1, 12)); // NOI18N
+        up.setForeground(new java.awt.Color(255, 255, 255));
+        up.setText("ENCENDER");
+        up.setBorder(null);
+        up.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        up.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                upActionPerformed(evt);
+            }
+        });
+        jPanel3.add(up, new org.netbeans.lib.awtextra.AbsoluteConstraints(310, 10, 90, 40));
 
         getContentPane().add(jPanel3, new org.netbeans.lib.awtextra.AbsoluteConstraints(190, 0, 500, 60));
 
@@ -455,6 +465,22 @@ public class Ventana extends javax.swing.JFrame {
  
     }//GEN-LAST:event_jSpinner2KeyReleased
 
+    private void upActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_upActionPerformed
+        try {
+            ino.sendData("1");
+        } catch (ArduinoException | SerialPortException ex) {
+            JOptionPane.showMessageDialog(null, ex, "Error", JOptionPane.ERROR_MESSAGE);
+        }
+    }//GEN-LAST:event_upActionPerformed
+
+    private void backActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_backActionPerformed
+        try {
+            ino.sendData("0");
+        } catch (ArduinoException | SerialPortException ex) {
+            JOptionPane.showMessageDialog(null, ex, "Error", JOptionPane.ERROR_MESSAGE);
+        }
+    }//GEN-LAST:event_backActionPerformed
+
     /**
      * @param args the command line arguments
      */
@@ -492,10 +518,9 @@ public class Ventana extends javax.swing.JFrame {
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JCheckBox allCheck;
+    private javax.swing.JButton back;
     private javax.swing.JCheckBox domingo;
     private javax.swing.JButton jButton1;
-    private javax.swing.JButton jButton2;
-    private javax.swing.JButton jButton3;
     private javax.swing.JButton jButton4;
     private javax.swing.JButton jButton5;
     private javax.swing.JComboBox<String> jComboBox1;
@@ -527,6 +552,7 @@ public class Ventana extends javax.swing.JFrame {
     private javax.swing.JCheckBox miercoles;
     private javax.swing.JComboBox<String> nTimbres;
     private javax.swing.JCheckBox sabado;
+    private javax.swing.JButton up;
     private javax.swing.JCheckBox viernes;
     // End of variables declaration//GEN-END:variables
 }
