@@ -1,24 +1,91 @@
-import javax.swing.JCheckBox;
 import com.panamahitek.PanamaHitek_Arduino;
 import com.panamahitek.ArduinoException;
-import javax.swing.JOptionPane;
+import java.util.*;
+import javax.swing.*;
+import javax.swing.table.DefaultTableModel;
 import jssc.SerialPortException;
 
 public class Ventana extends javax.swing.JFrame {
 
     PanamaHitek_Arduino ino = new PanamaHitek_Arduino();
+    DefaultTableModel tb = new DefaultTableModel();
+    DefaultListModel<String> list = new DefaultListModel<>();
+    listaTiempos times = new listaTiempos();
+    listaDias days = new listaDias();
+    listaHorarios horarios = new listaHorarios();
+    tiempo time;
+    horario hr;
+    Calendar cal;
+    int pos = -1;
+    int sonadas;
     public Ventana() {
         initComponents();
-        conexionArduino();
+        //conexionArduino();
+        tb = (DefaultTableModel) jTable1.getModel();
+        jList1.setModel(list);
+        sonadas = 0;
+        hilo.start();
+    }
+    
+    private void mensaje(String titulo, String texto, int icon){
+        JOptionPane.showMessageDialog(null, texto, titulo, icon);
+    }
+    
+    private void guardarTiempo(){
+        try {
+            time = new tiempo();
+            time.setHora((int) sp1.getValue());
+            time.setMinutos((int) sp2.getValue());
+            time.setMomento(moment.getSelectedItem().toString());
+            time.setRepeticiones(nTimbres.getSelectedIndex()+1);
+            times.add(time);
+            list.addElement(time.toString());
+            //listarTiempos();
+        } catch (Exception e) {
+            mensaje("Error", e.toString(), JOptionPane.ERROR_MESSAGE);
+        }
+    }
+    
+    private void listarTiempos(){
+        list.clear();
+        for (int i = 0; i < times.len(); i++) {
+            list.addElement(times.get(i).toString());
+        }
+    }
+    
+    private void guardarHorario(){
+        try {
+            capturarDias();
+            hr = new horario();
+            hr.setHoras(times);
+            hr.setDias(days);
+            horarios.add(hr);
+            listarHorarios();
+            times = new listaTiempos();
+            days = new listaDias();
+        } catch (Exception e) {
+            mensaje("Error", e.toString(), JOptionPane.ERROR_MESSAGE);
+        }
+    }
+    
+    private void listarHorarios(){
+        tb.setRowCount(horarios.len());
+        for (int i = 0; i < horarios.len(); i++) {
+            tb.setValueAt(i+1, i, 0);
+            tb.setValueAt(horarios.get(i).getHoras().listarHoras(), i, 1);
+            tb.setValueAt(horarios.get(i).getDias().mostrar(), i, 2);
+        }
     }
     
     private void conexionArduino(){
         try {
             ino.arduinoTX("COM10", 9600);
         } catch (ArduinoException e) {
-            JOptionPane.showMessageDialog(null, e, "Error", JOptionPane.ERROR_MESSAGE);
+            mensaje("Error", e.getMessage(), JOptionPane.ERROR_MESSAGE);
         }
     }
+    
+    
 
     private void notCheckAll(JCheckBox ch){
         if(!ch.isSelected()){
@@ -26,6 +93,136 @@ public class Ventana extends javax.swing.JFrame {
         }
     }
     
+    private void capturarDias(){
+        if(lunes.isSelected()) days.add(2); 
+        if(martes.isSelected())days.add(3); 
+        if(miercoles.isSelected())days.add(4); 
+        if(jueves.isSelected())days.add(5); 
+        if(viernes.isSelected())days.add(6); 
+        if(sabado.isSelected())days.add(7); 
+        if(domingo.isSelected()) days.add(1); 
+    }
+    
+    private String darDia(int i){
+        String salida = "";
+        switch(i){
+            case 1: salida = "Dom"; break;
+            case 2: salida = "Lun"; break;
+            case 3: salida = "Mar"; break;
+            case 4: salida = "Mié"; break;
+            case 5: salida = "Jue"; break;
+            case 6: salida = "Vie"; break;
+            case 7: salida = "Sáb"; break;
+        }
+        return salida;
+    }
+    
+    private boolean comprobarHora(int hora, int min, String mom, int dia){
+        if(pos>-1){
+            listaTiempos tms = horarios.get(pos).getHoras();
+            listaDias dys = horarios.get(pos).getDias();
+            for(int i = 0; i<tms.len(); i++){
+                if(hora==tms.get(i).getHora()&&min==tms.get(i).getMinutos()&&mom.equals(tms.get(i).getMomento())){
+                    for (int j = 0; j < dys.len(); j++) {
+                        if(dia==dys.get(j)){
+                            sonadas = tms.get(i).getRepeticiones();
+                            return true;
+                        }
+                    }
+                }
+            }
+        }
+        return false;
+    }
+    
+    private void encender(){
+        try {
+            ino.sendData("1");
+        } catch (ArduinoException | SerialPortException ex) {
+            mensaje("Error", ex.getMessage(), JOptionPane.ERROR_MESSAGE);
+        }
+    }
+    
+    private void apagar(){
+        try {
+            ino.sendData("0");
+        } catch (ArduinoException | SerialPortException ex) {
+            mensaje("Error", ex.getMessage(), JOptionPane.ERROR_MESSAGE);
+        }
+    }
+    
+    // HILO DE EJECUCIÓN
+    Thread hilo = new Thread(){
+        @Override
+        public void run() {
+            try {
+                cal = new GregorianCalendar();
+                int hora = cal.get(Calendar.HOUR_OF_DAY);
+                int min = cal.get(Calendar.MINUTE);
+                int seg = cal.get(Calendar.SECOND);
+                int dia = cal.get(Calendar.DAY_OF_WEEK);
+                int contSeg = 0;
+                boolean estado = false;
+                String mom = "";
+                if(hora>12){ mom = "PM"; hora = hora-12;}
+                else {mom = "AM"; hora = 1;}
+                while (true){
+                    //Reloj
+                    if(seg<59) {
+                        seg++;
+                        if(contSeg<3&&sonadas>0&&estado){
+                            contSeg++;
+                        }
+                        else if(estado&&contSeg==3){
+                            contSeg=0;
+                            sonadas--;
+                        } 
+                    }
+                    else { 
+                        seg = 0;
+                        if(min<59){
+                            min++;
+                            if(comprobarHora(hora, min, mom, dia)) estado = true;
+                            else estado = false;
+                        }
+                        else{ 
+                            min = 0;
+                            if(hora<12) hora++;
+                            else { 
+                               if(hora>12){ mom = "PM"; hora = hora-12;}
+                               else {mom = "AM"; hora = 1;}
+                               
+                            };
+                        }
+                    }
+                    if(contSeg==1){
+                        encender();
+                        System.out.println("Encendido");
+                    } else if (contSeg==3){
+                        apagar();
+                        System.out.println("Apagado");
+                    }
+                    
+
+                    //como se mostrará
+                    String h = hora+"", m = min+"", s = seg+"";
+                    if(seg<10) s = "0"+s;
+                    if(min<10) m = "0"+m;
+                    if(hora<10) h = "0"+h;
+
+                    tiempo.setText(h+":"+m+":"+s+ " "+ mom + " "+ darDia(dia));
+                    sleep(1000);
+                }
+            } catch (Exception e) {
+                mensaje("Error", e.toString(), JOptionPane.ERROR_MESSAGE);
+            }
+        }
+    
+        
+    
+    };
+    
+   
     
     @SuppressWarnings("unchecked")
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
@@ -35,9 +232,9 @@ public class Ventana extends javax.swing.JFrame {
         jPanel1 = new javax.swing.JPanel();
         jLabel1 = new javax.swing.JLabel();
         jSeparator1 = new javax.swing.JSeparator();
-        jSpinner1 = new javax.swing.JSpinner();
-        jSpinner2 = new javax.swing.JSpinner();
-        jComboBox1 = new javax.swing.JComboBox<>();
+        sp2 = new javax.swing.JSpinner();
+        sp1 = new javax.swing.JSpinner();
+        moment = new javax.swing.JComboBox<>();
         jButton1 = new javax.swing.JButton();
         jScrollPane2 = new javax.swing.JScrollPane();
         jList1 = new javax.swing.JList<>();
@@ -56,6 +253,7 @@ public class Ventana extends javax.swing.JFrame {
         jPanel3 = new javax.swing.JPanel();
         back = new javax.swing.JButton();
         up = new javax.swing.JButton();
+        tiempo = new javax.swing.JLabel();
         jPanel4 = new javax.swing.JPanel();
         jSeparator2 = new javax.swing.JSeparator();
         jLabel2 = new javax.swing.JLabel();
@@ -88,38 +286,38 @@ public class Ventana extends javax.swing.JFrame {
         jSeparator1.setAlignmentY(2.0F);
         jPanel1.add(jSeparator1, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 70, 170, 10));
 
-        jSpinner1.setFont(new java.awt.Font("Segoe UI Light", 1, 12)); // NOI18N
-        jSpinner1.setModel(new javax.swing.SpinnerNumberModel(0, 0, 59, 5));
-        jSpinner1.setBorder(null);
-        jPanel1.add(jSpinner1, new org.netbeans.lib.awtextra.AbsoluteConstraints(70, 80, 50, 30));
+        sp2.setFont(new java.awt.Font("Segoe UI Light", 1, 12)); // NOI18N
+        sp2.setModel(new javax.swing.SpinnerNumberModel(0, 0, 59, 5));
+        sp2.setBorder(null);
+        jPanel1.add(sp2, new org.netbeans.lib.awtextra.AbsoluteConstraints(70, 80, 50, 30));
 
-        jSpinner2.setFont(new java.awt.Font("Segoe UI Light", 1, 12)); // NOI18N
-        jSpinner2.setModel(new javax.swing.SpinnerNumberModel(1, 1, 12, 1));
-        jSpinner2.setBorder(null);
-        jSpinner2.addChangeListener(new javax.swing.event.ChangeListener() {
+        sp1.setFont(new java.awt.Font("Segoe UI Light", 1, 12)); // NOI18N
+        sp1.setModel(new javax.swing.SpinnerNumberModel(1, 1, 12, 1));
+        sp1.setBorder(null);
+        sp1.addChangeListener(new javax.swing.event.ChangeListener() {
             public void stateChanged(javax.swing.event.ChangeEvent evt) {
-                jSpinner2StateChanged(evt);
+                sp1StateChanged(evt);
             }
         });
-        jSpinner2.addKeyListener(new java.awt.event.KeyAdapter() {
+        sp1.addKeyListener(new java.awt.event.KeyAdapter() {
             public void keyReleased(java.awt.event.KeyEvent evt) {
-                jSpinner2KeyReleased(evt);
+                sp1KeyReleased(evt);
             }
         });
-        jPanel1.add(jSpinner2, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 80, 50, 30));
+        jPanel1.add(sp1, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 80, 50, 30));
 
-        jComboBox1.setBackground(new java.awt.Color(15, 65, 98));
-        jComboBox1.setFont(new java.awt.Font("Segoe UI Light", 1, 12)); // NOI18N
-        jComboBox1.setForeground(new java.awt.Color(255, 255, 255));
-        jComboBox1.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "AM", "PM" }));
-        jComboBox1.setBorder(null);
-        jComboBox1.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
-        jComboBox1.addActionListener(new java.awt.event.ActionListener() {
+        moment.setBackground(new java.awt.Color(15, 65, 98));
+        moment.setFont(new java.awt.Font("Segoe UI Light", 1, 12)); // NOI18N
+        moment.setForeground(new java.awt.Color(255, 255, 255));
+        moment.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "AM", "PM" }));
+        moment.setBorder(null);
+        moment.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        moment.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jComboBox1ActionPerformed(evt);
+                momentActionPerformed(evt);
             }
         });
-        jPanel1.add(jComboBox1, new org.netbeans.lib.awtextra.AbsoluteConstraints(130, 80, -1, 30));
+        jPanel1.add(moment, new org.netbeans.lib.awtextra.AbsoluteConstraints(130, 80, -1, 30));
 
         jButton1.setBackground(new java.awt.Color(23, 83, 123));
         jButton1.setFont(new java.awt.Font("Segoe UI Light", 1, 14)); // NOI18N
@@ -127,16 +325,16 @@ public class Ventana extends javax.swing.JFrame {
         jButton1.setText("AGREGAR");
         jButton1.setBorder(null);
         jButton1.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        jButton1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton1ActionPerformed(evt);
+            }
+        });
         jPanel1.add(jButton1, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 170, 170, 40));
 
         jList1.setBackground(new java.awt.Color(36, 46, 52));
         jList1.setFont(new java.awt.Font("Segoe UI Light", 1, 14)); // NOI18N
         jList1.setForeground(new java.awt.Color(255, 204, 51));
-        jList1.setModel(new javax.swing.AbstractListModel<String>() {
-            String[] strings = { "12:55 AM", "1:20 PM" };
-            public int getSize() { return strings.length; }
-            public String getElementAt(int i) { return strings[i]; }
-        });
         jList1.setSelectionMode(javax.swing.ListSelectionModel.SINGLE_SELECTION);
         jList1.setSelectionBackground(new java.awt.Color(56, 96, 169));
         jScrollPane2.setViewportView(jList1);
@@ -194,7 +392,7 @@ public class Ventana extends javax.swing.JFrame {
 
         jTable1.setBackground(new java.awt.Color(1, 34, 57));
         jTable1.setBorder(javax.swing.BorderFactory.createEmptyBorder(1, 1, 1, 1));
-        jTable1.setFont(new java.awt.Font("Segoe UI Light", 0, 12)); // NOI18N
+        jTable1.setFont(new java.awt.Font("Segoe UI Light", 0, 14)); // NOI18N
         jTable1.setForeground(new java.awt.Color(255, 204, 51));
         jTable1.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
@@ -219,6 +417,14 @@ public class Ventana extends javax.swing.JFrame {
                 return canEdit [columnIndex];
             }
         });
+        jTable1.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                jTable1MouseClicked(evt);
+            }
+            public void mousePressed(java.awt.event.MouseEvent evt) {
+                jTable1MousePressed(evt);
+            }
+        });
         jScrollPane1.setViewportView(jTable1);
         if (jTable1.getColumnModel().getColumnCount() > 0) {
             jTable1.getColumnModel().getColumn(0).setMinWidth(35);
@@ -233,7 +439,6 @@ public class Ventana extends javax.swing.JFrame {
         jTextArea1.setFont(new java.awt.Font("Segoe UI Light", 0, 14)); // NOI18N
         jTextArea1.setForeground(new java.awt.Color(255, 204, 51));
         jTextArea1.setRows(2);
-        jTextArea1.setText("Horas: 6:00-AM-1, 7:00-AM-1\nDías: Lun, Mar, Mié, Jue, Vie");
         jTextArea1.setBorder(null);
         jTextArea1.setFocusable(false);
         jScrollPane3.setViewportView(jTextArea1);
@@ -246,6 +451,11 @@ public class Ventana extends javax.swing.JFrame {
         jButton4.setText("ESTABLECER");
         jButton4.setBorder(null);
         jButton4.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        jButton4.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton4ActionPerformed(evt);
+            }
+        });
         jPanel2.add(jButton4, new org.netbeans.lib.awtextra.AbsoluteConstraints(170, 210, 160, 40));
 
         getContentPane().add(jPanel2, new org.netbeans.lib.awtextra.AbsoluteConstraints(190, 190, 500, 260));
@@ -278,6 +488,15 @@ public class Ventana extends javax.swing.JFrame {
             }
         });
         jPanel3.add(up, new org.netbeans.lib.awtextra.AbsoluteConstraints(310, 10, 90, 40));
+
+        tiempo.setBackground(new java.awt.Color(255, 255, 255));
+        tiempo.setFont(new java.awt.Font("Segoe UI Symbol", 1, 24)); // NOI18N
+        tiempo.setForeground(new java.awt.Color(255, 204, 51));
+        tiempo.setHorizontalAlignment(javax.swing.SwingConstants.LEFT);
+        tiempo.setText("00:00:00");
+        tiempo.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
+        tiempo.setHorizontalTextPosition(javax.swing.SwingConstants.LEADING);
+        jPanel3.add(tiempo, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 10, 190, 40));
 
         getContentPane().add(jPanel3, new org.netbeans.lib.awtextra.AbsoluteConstraints(190, 0, 500, 60));
 
@@ -392,6 +611,11 @@ public class Ventana extends javax.swing.JFrame {
         jButton5.setText("GUARDAR");
         jButton5.setBorder(null);
         jButton5.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        jButton5.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton5ActionPerformed(evt);
+            }
+        });
         jPanel4.add(jButton5, new org.netbeans.lib.awtextra.AbsoluteConstraints(180, 80, 160, 40));
 
         getContentPane().add(jPanel4, new org.netbeans.lib.awtextra.AbsoluteConstraints(190, 60, 500, 130));
@@ -400,9 +624,9 @@ public class Ventana extends javax.swing.JFrame {
         setLocationRelativeTo(null);
     }// </editor-fold>//GEN-END:initComponents
 
-    private void jComboBox1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jComboBox1ActionPerformed
+    private void momentActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_momentActionPerformed
         // TODO add your handling code here:
-    }//GEN-LAST:event_jComboBox1ActionPerformed
+    }//GEN-LAST:event_momentActionPerformed
 
     private void martesActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_martesActionPerformed
         notCheckAll(martes);
@@ -457,29 +681,47 @@ public class Ventana extends javax.swing.JFrame {
         else jLabel4.setText("vez.");
     }//GEN-LAST:event_nTimbresActionPerformed
 
-    private void jSpinner2StateChanged(javax.swing.event.ChangeEvent evt) {//GEN-FIRST:event_jSpinner2StateChanged
+    private void sp1StateChanged(javax.swing.event.ChangeEvent evt) {//GEN-FIRST:event_sp1StateChanged
         
-    }//GEN-LAST:event_jSpinner2StateChanged
+    }//GEN-LAST:event_sp1StateChanged
 
-    private void jSpinner2KeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_jSpinner2KeyReleased
+    private void sp1KeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_sp1KeyReleased
  
-    }//GEN-LAST:event_jSpinner2KeyReleased
+    }//GEN-LAST:event_sp1KeyReleased
 
     private void upActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_upActionPerformed
-        try {
-            ino.sendData("1");
-        } catch (ArduinoException | SerialPortException ex) {
-            JOptionPane.showMessageDialog(null, ex, "Error", JOptionPane.ERROR_MESSAGE);
-        }
+        encender();
     }//GEN-LAST:event_upActionPerformed
 
     private void backActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_backActionPerformed
-        try {
-            ino.sendData("0");
-        } catch (ArduinoException | SerialPortException ex) {
-            JOptionPane.showMessageDialog(null, ex, "Error", JOptionPane.ERROR_MESSAGE);
-        }
+        apagar();
     }//GEN-LAST:event_backActionPerformed
+
+    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
+        guardarTiempo();
+    }//GEN-LAST:event_jButton1ActionPerformed
+
+    private void jButton5ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton5ActionPerformed
+        guardarHorario();
+    }//GEN-LAST:event_jButton5ActionPerformed
+
+    private void jTable1MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jTable1MouseClicked
+        jTextArea1.setText(horarios.get(jTable1.getSelectedRow()).toString());
+        
+    }//GEN-LAST:event_jTable1MouseClicked
+
+    private void jTable1MousePressed(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jTable1MousePressed
+        
+    }//GEN-LAST:event_jTable1MousePressed
+
+    private void jButton4ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton4ActionPerformed
+        if(jTable1.getSelectedRow()>-1){
+            pos = jTable1.getSelectedRow();
+            mensaje("INFORMACIÓN", "El timbre ha sido programado", JOptionPane.INFORMATION_MESSAGE);
+        } else {
+            mensaje("ADVERTENCIA", "Debe seleccionar un horarios", JOptionPane.WARNING_MESSAGE);
+        }
+    }//GEN-LAST:event_jButton4ActionPerformed
 
     /**
      * @param args the command line arguments
@@ -523,7 +765,6 @@ public class Ventana extends javax.swing.JFrame {
     private javax.swing.JButton jButton1;
     private javax.swing.JButton jButton4;
     private javax.swing.JButton jButton5;
-    private javax.swing.JComboBox<String> jComboBox1;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
@@ -542,16 +783,18 @@ public class Ventana extends javax.swing.JFrame {
     private javax.swing.JSeparator jSeparator1;
     private javax.swing.JSeparator jSeparator2;
     private javax.swing.JSeparator jSeparator3;
-    private javax.swing.JSpinner jSpinner1;
-    private javax.swing.JSpinner jSpinner2;
     private javax.swing.JTable jTable1;
     private javax.swing.JTextArea jTextArea1;
     private javax.swing.JCheckBox jueves;
     private javax.swing.JCheckBox lunes;
     private javax.swing.JCheckBox martes;
     private javax.swing.JCheckBox miercoles;
+    private javax.swing.JComboBox<String> moment;
     private javax.swing.JComboBox<String> nTimbres;
     private javax.swing.JCheckBox sabado;
+    private javax.swing.JSpinner sp1;
+    private javax.swing.JSpinner sp2;
+    private javax.swing.JLabel tiempo;
     private javax.swing.JButton up;
     private javax.swing.JCheckBox viernes;
     // End of variables declaration//GEN-END:variables
