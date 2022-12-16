@@ -165,7 +165,7 @@ public class Ventana extends javax.swing.JFrame {
                 boolean estado = false;
                 String mom = "";
                 if(hora>12){ mom = "PM"; hora = hora-12;}
-                else {mom = "AM"; hora = 1;}
+                else {mom = "AM";}
                 while (true){
                     //Reloj
                     if(seg<59) {
@@ -217,12 +217,21 @@ public class Ventana extends javax.swing.JFrame {
                 mensaje("Error", e.toString(), JOptionPane.ERROR_MESSAGE);
             }
         }
-    
-        
-    
     };
     
-   
+   private void limpiar(){
+       lunes.setSelected(false);
+       martes.setSelected(false);
+       miercoles.setSelected(false);
+       jueves.setSelected(false);
+       viernes.setSelected(false);
+       sabado.setSelected(false);
+       domingo.setSelected(false);
+       allCheck.setSelected(false);
+       list.setSize(0);
+       nTimbres.setSelectedIndex(0);
+   }
+    
     
     @SuppressWarnings("unchecked")
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
@@ -703,6 +712,7 @@ public class Ventana extends javax.swing.JFrame {
 
     private void jButton5ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton5ActionPerformed
         guardarHorario();
+        limpiar();
     }//GEN-LAST:event_jButton5ActionPerformed
 
     private void jTable1MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jTable1MouseClicked
