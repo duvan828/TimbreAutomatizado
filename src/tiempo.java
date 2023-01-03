@@ -1,13 +1,13 @@
 public class tiempo {
     private int hora;
     private int minutos;
-    private String momento;
+    private int momento;
     private int repeticiones;
 
     public tiempo() {
         hora = 0;
         minutos = 0;
-        momento = "AM";
+        momento = 0;
         repeticiones = 0;
     }
 
@@ -27,11 +27,11 @@ public class tiempo {
         this.minutos = minutos;
     }
 
-    public String getMomento() {
+    public int getMomento() {
         return momento;
     }
 
-    public void setMomento(String momento) {
+    public void setMomento(int momento) {
         this.momento = momento;
     }
 
@@ -44,13 +44,16 @@ public class tiempo {
     }
     
     public String toString(){
-       String h = ""+hora, m = ""+minutos;
+       String h = ""+hora, m = ""+minutos, mom = "";
        if(hora<10){
            h = "0"+h;
        }
        if(minutos<10){
            m = "0"+m;
        }
-        return h+":"+m+"-"+momento+"-"+repeticiones;
+       if(momento==0) mom = "AM";
+       else mom = "PM";
+       
+        return h+":"+m+"-"+mom+"-"+repeticiones;
     }
 }

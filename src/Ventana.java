@@ -3,6 +3,8 @@ import com.panamahitek.ArduinoException;
 import java.util.*;
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
+import jssc.SerialPortEvent;
+import jssc.SerialPortEventListener;
 import jssc.SerialPortException;
 
 public class Ventana extends javax.swing.JFrame {
@@ -18,9 +20,22 @@ public class Ventana extends javax.swing.JFrame {
     Calendar cal;
     int pos = -1;
     int sonadas;
+    SerialPortEventListener listener = new SerialPortEventListener() {
+        @Override
+        public void serialEvent(SerialPortEvent spe) {
+            try {
+                if(ino.isMessageAvailable()) mensaje("ARDUINO DICE", ino.printMessage(), JOptionPane.INFORMATION_MESSAGE);
+            } catch (SerialPortException e) {
+                mensaje("Error", e.getMessage(), JOptionPane.ERROR_MESSAGE);
+            }
+            catch (ArduinoException e) {
+                mensaje("Error", e.getMessage(), JOptionPane.ERROR_MESSAGE);
+            }
+        }
+    };
     public Ventana() {
         initComponents();
-        //conexionArduino();
+        conexionArduino();
         tb = (DefaultTableModel) jTable1.getModel();
         jList1.setModel(list);
         sonadas = 0;
@@ -36,7 +51,7 @@ public class Ventana extends javax.swing.JFrame {
             time = new tiempo();
             time.setHora((int) sp1.getValue());
             time.setMinutos((int) sp2.getValue());
-            time.setMomento(moment.getSelectedItem().toString());
+            time.setMomento(moment.getSelectedIndex());
             time.setRepeticiones(nTimbres.getSelectedIndex()+1);
             times.add(time);
             list.addElement(time.toString());
@@ -79,7 +94,8 @@ public class Ventana extends javax.swing.JFrame {
     
     private void conexionArduino(){
         try {
-            ino.arduinoTX("COM10", 9600);
+            String puerto = ino.getSerialPorts().get(0);
+            ino.arduinoRXTX(puerto, 9600, listener);
         } catch (ArduinoException e) {
             mensaje("Error", e.getMessage(), JOptionPane.ERROR_MESSAGE);
         }
@@ -117,12 +133,12 @@ public class Ventana extends javax.swing.JFrame {
         return salida;
     }
     
-    private boolean comprobarHora(int hora, int min, String mom, int dia){
+    private boolean comprobarHora(int hora, int min, int mom, int dia){
         if(pos>-1){
             listaTiempos tms = horarios.get(pos).getHoras();
             listaDias dys = horarios.get(pos).getDias();
             for(int i = 0; i<tms.len(); i++){
-                if(hora==tms.get(i).getHora()&&min==tms.get(i).getMinutos()&&mom.equals(tms.get(i).getMomento())){
+                if(hora==tms.get(i).getHora()&&min==tms.get(i).getMinutos()&&mom==tms.get(i).getMomento()){
                     for (int j = 0; j < dys.len(); j++) {
                         if(dia==dys.get(j)){
                             sonadas = tms.get(i).getRepeticiones();
@@ -151,21 +167,52 @@ public class Ventana extends javax.swing.JFrame {
         }
     }
     
+    private void enviarInformacion(){
+        try {
+            String salida = "2,";
+            cal = new GregorianCalendar();
+            int hora = cal.get(Calendar.HOUR);
+            if(hora==0) hora = 12;
+            int min = cal.get(Calendar.MINUTE);
+            int seg = cal.get(Calendar.SECOND);
+            int mom = cal.get(Calendar.AM_PM);
+            int dia = cal.get(Calendar.DAY_OF_WEEK);
+            salida += hora+"," + min+"," + seg+","+mom+","+dia+",";
+            for (int i = 0; i < horarios.get(pos).getHoras().len(); i++) {
+                salida += horarios.get(pos).getHoras().get(i).getHora()+"-"
+                       + horarios.get(pos).getHoras().get(i).getMinutos()+"-"
+                       + horarios.get(pos).getHoras().get(i).getMomento()+"-"
+                       + horarios.get(pos).getHoras().get(i).getRepeticiones()+"-*";
+            }
+            salida += ",";
+            for (int i = 0; i < horarios.get(pos).getDias().len(); i++)
+                salida += horarios.get(pos).getDias().get(i)+"*";
+            salida += ",";
+            System.out.println(salida);
+            ino.sendData(salida);
+        } catch (ArduinoException | SerialPortException ex) {
+            mensaje("Error", ex.getMessage(), JOptionPane.ERROR_MESSAGE);
+        }
+    }
+    
     // HILO DE EJECUCIÓN
     Thread hilo = new Thread(){
         @Override
         public void run() {
             try {
                 cal = new GregorianCalendar();
-                int hora = cal.get(Calendar.HOUR_OF_DAY);
+                int hora = cal.get(Calendar.HOUR);
                 int min = cal.get(Calendar.MINUTE);
                 int seg = cal.get(Calendar.SECOND);
+                int mm = cal.get(Calendar.AM_PM);
+                System.out.println(mm);
                 int dia = cal.get(Calendar.DAY_OF_WEEK);
                 int contSeg = 0;
                 boolean estado = false;
                 String mom = "";
-                if(hora>12){ mom = "PM"; hora = hora-12;}
-                else {mom = "AM";}
+                if(hora==0) hora = 12;
+                if(mm==0) mom = "AM";
+                else {mom = "PM";}
                 while (true){
                     //Reloj
                     if(seg<59) {
@@ -182,24 +229,27 @@ public class Ventana extends javax.swing.JFrame {
                         seg = 0;
                         if(min<59){
                             min++;
-                            if(comprobarHora(hora, min, mom, dia)) estado = true;
+                            if(comprobarHora(hora, min, mm, dia)) estado = true;
                             else estado = false;
                         }
                         else{ 
                             min = 0;
+                            if(comprobarHora(hora, min, mm, dia)) estado = true;
+                            else estado = false;
                             if(hora<12) hora++;
-                            else { 
-                               if(hora>12){ mom = "PM"; hora = hora-12;}
-                               else {mom = "AM"; hora = 1;}
+                            else {
+                               hora = 1;
+                               if(Calendar.AM==0)mom = "AM";
+                               else mom = "PM";
                                
                             };
                         }
                     }
                     if(contSeg==1){
-                        encender();
+                        //encender();
                         System.out.println("Encendido");
                     } else if (contSeg==3){
-                        apagar();
+                        //apagar();
                         System.out.println("Apagado");
                     }
                     
@@ -505,7 +555,7 @@ public class Ventana extends javax.swing.JFrame {
         tiempo.setText("00:00:00");
         tiempo.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
         tiempo.setHorizontalTextPosition(javax.swing.SwingConstants.LEADING);
-        jPanel3.add(tiempo, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 10, 190, 40));
+        jPanel3.add(tiempo, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 10, 260, 40));
 
         getContentPane().add(jPanel3, new org.netbeans.lib.awtextra.AbsoluteConstraints(190, 0, 500, 60));
 
@@ -727,6 +777,7 @@ public class Ventana extends javax.swing.JFrame {
     private void jButton4ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton4ActionPerformed
         if(jTable1.getSelectedRow()>-1){
             pos = jTable1.getSelectedRow();
+            enviarInformacion();
             mensaje("INFORMACIÓN", "El timbre ha sido programado", JOptionPane.INFORMATION_MESSAGE);
         } else {
             mensaje("ADVERTENCIA", "Debe seleccionar un horarios", JOptionPane.WARNING_MESSAGE);
