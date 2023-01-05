@@ -9,6 +9,7 @@ import jssc.SerialPortException;
 
 public class Ventana extends javax.swing.JFrame {
 
+    static Ventana frame;
     PanamaHitek_Arduino ino = new PanamaHitek_Arduino();
     DefaultTableModel tb = new DefaultTableModel();
     DefaultListModel<String> list = new DefaultListModel<>();
@@ -16,6 +17,7 @@ public class Ventana extends javax.swing.JFrame {
     listaDias days = new listaDias();
     listaHorarios horarios;
     controlador control = new controlador();
+    editarHorario FrameEditar = new editarHorario();
     tiempo time;
     horario hr;
     Calendar cal;
@@ -42,7 +44,7 @@ public class Ventana extends javax.swing.JFrame {
         jList1.setModel(list);
         sonadas = 0;
         cargarDatos();
-        if(horarios.len()>select) selectRow();
+        if(select>-1) selectRow();
         hilo.start();
     }
     
@@ -54,6 +56,7 @@ public class Ventana extends javax.swing.JFrame {
             horarios = lstHr;
         }
         listarHorarios();
+        if(select>-1) jTextArea1.setText(horarios.get(select).toString());
     }
     
     private void selectRow(){
@@ -68,6 +71,11 @@ public class Ventana extends javax.swing.JFrame {
         JOptionPane.showMessageDialog(null, texto, titulo, icon);
     }
     
+    public void recibirEdit(horario h){
+        control.editHorario(h);
+        cargarDatos();
+    }
+    
     private void guardarTiempo(){
         try {
             time = new tiempo();
@@ -79,7 +87,7 @@ public class Ventana extends javax.swing.JFrame {
             list.addElement(time.toString());
             //listarTiempos();
         } catch (Exception e) {
-            mensaje("Error", e.toString(), JOptionPane.ERROR_MESSAGE);
+            mensaje("Error", e.getMessage(), JOptionPane.ERROR_MESSAGE);
         }
     }
     
@@ -363,15 +371,20 @@ public class Ventana extends javax.swing.JFrame {
 
         popTabla.setBackground(new java.awt.Color(4, 36, 57));
 
-        popEditar.setBackground(new java.awt.Color(255, 255, 255));
+        popEditar.setBackground(new java.awt.Color(9, 43, 78));
         popEditar.setFont(new java.awt.Font("Segoe UI Light", 0, 14)); // NOI18N
-        popEditar.setForeground(new java.awt.Color(0, 0, 0));
+        popEditar.setForeground(new java.awt.Color(255, 204, 51));
         popEditar.setText("Editar");
+        popEditar.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                popEditarActionPerformed(evt);
+            }
+        });
         popTabla.add(popEditar);
 
-        popEliminar.setBackground(new java.awt.Color(255, 255, 255));
+        popEliminar.setBackground(new java.awt.Color(9, 43, 78));
         popEliminar.setFont(new java.awt.Font("Segoe UI Light", 0, 14)); // NOI18N
-        popEliminar.setForeground(new java.awt.Color(0, 0, 0));
+        popEliminar.setForeground(new java.awt.Color(255, 204, 51));
         popEliminar.setText("Eliminar");
         popEliminar.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -380,7 +393,9 @@ public class Ventana extends javax.swing.JFrame {
         });
         popTabla.add(popEliminar);
 
+        eliminarLista.setBackground(new java.awt.Color(9, 43, 78));
         eliminarLista.setFont(new java.awt.Font("Segoe UI Light", 0, 14)); // NOI18N
+        eliminarLista.setForeground(new java.awt.Color(255, 204, 51));
         eliminarLista.setText("Eliminar");
         eliminarLista.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -430,7 +445,7 @@ public class Ventana extends javax.swing.JFrame {
 
         moment.setBackground(new java.awt.Color(15, 65, 98));
         moment.setFont(new java.awt.Font("Segoe UI Light", 1, 12)); // NOI18N
-        moment.setForeground(new java.awt.Color(255, 255, 255));
+        moment.setForeground(new java.awt.Color(255, 204, 51));
         moment.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "AM", "PM" }));
         moment.setBorder(null);
         moment.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
@@ -478,9 +493,11 @@ public class Ventana extends javax.swing.JFrame {
         jLabel4.setText("vez.");
         jPanel1.add(jLabel4, new org.netbeans.lib.awtextra.AbsoluteConstraints(130, 130, 50, 30));
 
+        nTimbres.setBackground(new java.awt.Color(15, 65, 98));
         nTimbres.setFont(new java.awt.Font("Segoe UI Light", 1, 12)); // NOI18N
-        nTimbres.setForeground(new java.awt.Color(255, 255, 255));
+        nTimbres.setForeground(new java.awt.Color(255, 204, 51));
         nTimbres.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "1", "2", "3", "4" }));
+        nTimbres.setBorder(null);
         nTimbres.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 nTimbresActionPerformed(evt);
@@ -514,7 +531,6 @@ public class Ventana extends javax.swing.JFrame {
         jPanel2.add(jSeparator3, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 30, 170, 10));
 
         jTable1.setBackground(new java.awt.Color(1, 34, 57));
-        jTable1.setBorder(javax.swing.BorderFactory.createEmptyBorder(1, 1, 1, 1));
         jTable1.setFont(new java.awt.Font("Segoe UI Light", 0, 14)); // NOI18N
         jTable1.setForeground(new java.awt.Color(255, 204, 51));
         jTable1.setModel(new javax.swing.table.DefaultTableModel(
@@ -628,6 +644,7 @@ public class Ventana extends javax.swing.JFrame {
         jLabel2.setHorizontalTextPosition(javax.swing.SwingConstants.LEADING);
         jPanel4.add(jLabel2, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 10, 40, 50));
 
+        allCheck.setBackground(new java.awt.Color(1, 45, 75));
         allCheck.setFont(new java.awt.Font("Segoe UI Light", 1, 14)); // NOI18N
         allCheck.setForeground(new java.awt.Color(255, 255, 255));
         allCheck.setText("Todos");
@@ -639,6 +656,7 @@ public class Ventana extends javax.swing.JFrame {
         });
         jPanel4.add(allCheck, new org.netbeans.lib.awtextra.AbsoluteConstraints(230, 40, -1, -1));
 
+        lunes.setBackground(new java.awt.Color(1, 45, 75));
         lunes.setFont(new java.awt.Font("Segoe UI Light", 1, 14)); // NOI18N
         lunes.setForeground(new java.awt.Color(255, 255, 255));
         lunes.setText("Lunes");
@@ -650,6 +668,7 @@ public class Ventana extends javax.swing.JFrame {
         });
         jPanel4.add(lunes, new org.netbeans.lib.awtextra.AbsoluteConstraints(50, 10, 70, -1));
 
+        martes.setBackground(new java.awt.Color(1, 45, 75));
         martes.setFont(new java.awt.Font("Segoe UI Light", 1, 14)); // NOI18N
         martes.setForeground(new java.awt.Color(255, 255, 255));
         martes.setText("Martes");
@@ -661,6 +680,7 @@ public class Ventana extends javax.swing.JFrame {
         });
         jPanel4.add(martes, new org.netbeans.lib.awtextra.AbsoluteConstraints(130, 10, 90, -1));
 
+        miercoles.setBackground(new java.awt.Color(1, 45, 75));
         miercoles.setFont(new java.awt.Font("Segoe UI Light", 1, 14)); // NOI18N
         miercoles.setForeground(new java.awt.Color(255, 255, 255));
         miercoles.setText("Miércoles");
@@ -672,6 +692,7 @@ public class Ventana extends javax.swing.JFrame {
         });
         jPanel4.add(miercoles, new org.netbeans.lib.awtextra.AbsoluteConstraints(230, 10, -1, -1));
 
+        jueves.setBackground(new java.awt.Color(1, 45, 75));
         jueves.setFont(new java.awt.Font("Segoe UI Light", 1, 14)); // NOI18N
         jueves.setForeground(new java.awt.Color(255, 255, 255));
         jueves.setText("Jueves");
@@ -683,6 +704,7 @@ public class Ventana extends javax.swing.JFrame {
         });
         jPanel4.add(jueves, new org.netbeans.lib.awtextra.AbsoluteConstraints(330, 10, -1, -1));
 
+        viernes.setBackground(new java.awt.Color(1, 45, 75));
         viernes.setFont(new java.awt.Font("Segoe UI Light", 1, 14)); // NOI18N
         viernes.setForeground(new java.awt.Color(255, 255, 255));
         viernes.setText("Viernes");
@@ -694,6 +716,7 @@ public class Ventana extends javax.swing.JFrame {
         });
         jPanel4.add(viernes, new org.netbeans.lib.awtextra.AbsoluteConstraints(410, 10, -1, -1));
 
+        sabado.setBackground(new java.awt.Color(1, 45, 75));
         sabado.setFont(new java.awt.Font("Segoe UI Light", 1, 14)); // NOI18N
         sabado.setForeground(new java.awt.Color(255, 255, 255));
         sabado.setText("Sábado");
@@ -705,6 +728,7 @@ public class Ventana extends javax.swing.JFrame {
         });
         jPanel4.add(sabado, new org.netbeans.lib.awtextra.AbsoluteConstraints(50, 40, -1, -1));
 
+        domingo.setBackground(new java.awt.Color(1, 45, 75));
         domingo.setFont(new java.awt.Font("Segoe UI Light", 1, 14)); // NOI18N
         domingo.setForeground(new java.awt.Color(255, 255, 255));
         domingo.setText("Domingo");
@@ -860,37 +884,24 @@ public class Ventana extends javax.swing.JFrame {
         }
     }//GEN-LAST:event_eliminarListaActionPerformed
 
+    private void popEditarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_popEditarActionPerformed
+        int p = jTable1.getSelectedRow();
+        if(p!=-1){
+            FrameEditar.setVisible(true);
+            FrameEditar.aplicarDatos(frame, horarios.get(p));
+        } else {
+            mensaje("UPS!", "No hay horario seleccionado.", JOptionPane.WARNING_MESSAGE);
+        }
+    }//GEN-LAST:event_popEditarActionPerformed
+
     /**
      * @param args the command line arguments
      */
     public static void main(String args[]) {
-        /* Set the Nimbus look and feel */
-        //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
-        /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
-         * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html 
-         */
-        try {
-            for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
-                if ("Nimbus".equals(info.getName())) {
-                    javax.swing.UIManager.setLookAndFeel(info.getClassName());
-                    break;
-                }
-            }
-        } catch (ClassNotFoundException ex) {
-            java.util.logging.Logger.getLogger(Ventana.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (InstantiationException ex) {
-            java.util.logging.Logger.getLogger(Ventana.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (IllegalAccessException ex) {
-            java.util.logging.Logger.getLogger(Ventana.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (javax.swing.UnsupportedLookAndFeelException ex) {
-            java.util.logging.Logger.getLogger(Ventana.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        }
-        //</editor-fold>
-
-        /* Create and display the form */
+        frame = new Ventana();
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
-                new Ventana().setVisible(true);
+                frame.setVisible(true);
             }
         });
     }

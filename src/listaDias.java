@@ -11,6 +11,10 @@ public class listaDias {
     public int len(){
         return lista.size();
     }
+    
+    public void clear(){
+        lista.clear();
+    }
 
     public void add(int d){
         lista.add(d);

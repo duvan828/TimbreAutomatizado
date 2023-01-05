@@ -3,12 +3,8 @@
     <editor-bookmarks xmlns="http://www.netbeans.org/ns/editor-bookmarks/2" lastBookmarkId="0"/>
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
         <group>
-            <file>file:/C:/Users/Lenovo/Documents/NetBeansProjects/timbreAutomatico/src/db.json</file>
-            <file>file:/C:/Users/Lenovo/Documents/NetBeansProjects/timbreAutomatico/src/tiempo.java</file>
-            <file>file:/C:/Users/Lenovo/Documents/NetBeansProjects/timbreAutomatico/src/controlador.java</file>
-            <file>file:/C:/Users/Lenovo/Documents/NetBeansProjects/timbreAutomatico/src/listaHorarios.java</file>
-            <file>file:/C:/Users/Lenovo/Documents/NetBeansProjects/timbreAutomatico/src/horario.java</file>
             <file>file:/C:/Users/Lenovo/Documents/NetBeansProjects/timbreAutomatico/src/Ventana.java</file>
+            <file>file:/C:/Users/Lenovo/Documents/NetBeansProjects/timbreAutomatico/src/editarHorario.java</file>
         </group>
     </open-files>
 </project-private>

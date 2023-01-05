@@ -12,6 +12,10 @@ public class listaTiempos {
         return lista.size();
     }
     
+    public void clear(){
+        lista.clear();
+    }
+    
     public void add(tiempo tm){
         lista.add(tm);
     }

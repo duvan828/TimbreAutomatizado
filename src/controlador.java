@@ -21,7 +21,7 @@ public class controlador {
     public void guardarDatos(){
         try {
             FileWriter file = new FileWriter(ruta+"/src/db.json");
-            file.write(cuerpo.toString());
+            file.write(cuerpo.toJSONString());
             file.flush();
             file.close();
         } catch (IOException ex) {
@@ -40,6 +40,14 @@ public class controlador {
         horario.put("horas", horas);
         horario.put("dias", dias);
         horarios.add(horario);
+    }
+    
+    private JSONObject getEditHorario(int id, JSONArray horas, JSONArray dias){
+        JSONObject horario = (JSONObject) new JSONObject();
+        horario.put("id", id);
+        horario.put("horas", horas);
+        horario.put("dias", dias);
+        return horario;
     }
     
     public void saveHorario(horario hr){
@@ -62,8 +70,50 @@ public class controlador {
         guardarDatos();
     }
     
+    private void reescribirHorarios(int id, JSONArray horas, JSONArray dias){
+        JSONArray datos = getHotarios();
+        JSONArray hr = new JSONArray();
+        cuerpo.clear();
+        cuerpo.put("horarios", hr);
+        for (int i = 0; i < datos.size(); i++) {
+            JSONObject obj = (JSONObject) datos.get(i);
+            if(Integer.parseInt((String)obj.get("id")) == id){
+                JSONObject nuevo = new JSONObject();
+                nuevo.put("id", id+"");
+                nuevo.put("horas", horas);
+                nuevo.put("dias", dias);
+                hr.add(nuevo);
+            } else hr.add(obj);
+        }
+    }
+    
+    public void editHorario(horario hr){
+        JSONArray horas = new JSONArray();
+        JSONArray dias = new JSONArray();
+        for (int i = 0; i < hr.getHoras().len(); i++) {
+            tiempo tm = hr.getHoras().get(i);
+            JSONObject obj = new JSONObject();
+            obj.put("hora", tm.getHora()+"");
+            obj.put("minutos", tm.getMinutos()+"");
+            obj.put("momento", tm.getMomento()+"");
+            obj.put("repeticiones", tm.getRepeticiones()+"");
+            horas.add(obj);
+        }
+        for (int i = 0; i < hr.getDias().len(); i++) {
+            int dia = hr.getDias().get(i);
+            dias.add(dia+"");
+        }
+        reescribirHorarios(hr.getId(), horas, dias);
+        guardarDatos();
+    }
+    
     public int getSelect(){
-        if(cuerpo.get("select")!=null) return Integer.parseInt((String) cuerpo.get("select")); 
+        if(cuerpo.get("select")!=null){
+            int s = Integer.parseInt((String) cuerpo.get("select"));
+            if(s>-1){
+                return s;
+            } else return -1;
+        } 
         else return -1;
     }
     
@@ -115,8 +165,8 @@ public class controlador {
                 horario.setDias(days);
                 horarios.add(horario);
             }
-        } else horarios = null;
-        return horarios;
+            return horarios;
+        } else return null;
     }
     
     public void eliminarHorario(int pos){
