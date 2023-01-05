@@ -24,4 +24,8 @@ public class listaHorarios {
      public horario get(int pos){
          return lista.get(pos);
      }
+     
+     public boolean vacio(){
+         return lista.isEmpty();
+     }
 }
