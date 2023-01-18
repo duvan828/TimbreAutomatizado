@@ -255,7 +255,8 @@ public class Ventana extends javax.swing.JFrame {
                 salida += horarios.get(pos).getHoras().get(i).getHora()+"-"
                        + horarios.get(pos).getHoras().get(i).getMinutos()+"-"
                        + horarios.get(pos).getHoras().get(i).getMomento()+"-"
-                       + horarios.get(pos).getHoras().get(i).getRepeticiones()+"-*";
+                       + horarios.get(pos).getHoras().get(i).getRepeticiones()+"-"
+                       + horarios.get(pos).getHoras().get(i).getDuracion()+"-*";
             }
             salida += ",";
             for (int i = 0; i < horarios.get(pos).getDias().len(); i++)
