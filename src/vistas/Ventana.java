@@ -13,19 +13,23 @@ import contror.*;
 import java.awt.Color;
 import java.awt.TextField;
 import java.awt.Toolkit;
+import javax.swing.table.*;
 import modelos.*;
 
 public class Ventana extends javax.swing.JFrame {
 
     static Ventana frame;
     PanamaHitek_Arduino ino = new PanamaHitek_Arduino();
-    DefaultTableModel tb = new DefaultTableModel();
+    DefaultTableModel tb, tbHr = new DefaultTableModel();
     DefaultListModel<String> list = new DefaultListModel<>();
     listaTiempos times = new listaTiempos();
     listaDias days = new listaDias();
     listaHorarios horarios;
     controlador control = new controlador();
     editarHorario FrameEditar = new editarHorario();
+    JTableHeader tableHeader;
+    TableColumnModel tableColumnModel;
+    TableColumn tableColumn;
     tiempo time;
     horario hr;
     Calendar cal;
@@ -51,6 +55,14 @@ public class Ventana extends javax.swing.JFrame {
         initComponents();
         try {
             tb = (DefaultTableModel) jTable1.getModel();
+            tbHr = (DefaultTableModel) tbHorario.getModel();
+            tableHeader = tbHorario.getTableHeader();
+            tableColumnModel = tableHeader.getColumnModel();
+            tableColumn = tableColumnModel.getColumn(0);
+            tableColumn.setHeaderValue("NO HAY HORARIO SELECCIONADO");
+            tableHeader.repaint();
+            tableColumn.setMaxWidth(tableHeader.getWidth());
+            tableColumn.setWidth(tableHeader.getWidth());
             jList1.setModel(list);
             sonadas = 0;
             cargarDatos();
@@ -72,7 +84,7 @@ public class Ventana extends javax.swing.JFrame {
         listarHorarios();
         if(select>-1){
             selectRow();
-            jTextArea1.setText(horarios.getForId(select).toString());
+            listarHorario(pos);
         }
     }
     
@@ -80,6 +92,7 @@ public class Ventana extends javax.swing.JFrame {
         for (int i = 0; i < horarios.len(); i++) {
             if(select==horarios.get(i).getId()){
                 jTable1.setRowSelectionInterval(i, i);
+                pos = i;
             }
         }
     }
@@ -147,6 +160,19 @@ public class Ventana extends javax.swing.JFrame {
             tb.setValueAt(horarios.get(i).getId(), i, 0);
             tb.setValueAt(horarios.get(i).getHoras().listarHoras(), i, 1);
             tb.setValueAt(horarios.get(i).getDias().mostrar(), i, 2);
+        }
+    }
+    
+    private void listarHorario(int ps){
+        horario obj  = horarios.get(ps);
+        tableColumn.setHeaderValue(obj.getDias().mostrar());
+        tableHeader.repaint();
+        tbHr.setRowCount(obj.getHoras().len());
+        lbId.setText(obj.getId()+"");
+        lbLenHoras.setText(obj.getHoras().len()+"");
+        lbLenDias.setText(obj.getDias().len()+"");
+        for (int i = 0; i < obj.getHoras().len(); i++) {
+            tbHr.setValueAt(obj.getHoras().get(i).toString(), i, 0);
         }
     }
     
@@ -241,6 +267,8 @@ public class Ventana extends javax.swing.JFrame {
     
     private void enviarInformacion() throws Exception{
         try {
+            pos = jTable1.getSelectedRow();
+            int id = horarios.get(pos).getId();
             conexionArduino();
             String salida = "2,";
             cal = new GregorianCalendar();
@@ -264,9 +292,11 @@ public class Ventana extends javax.swing.JFrame {
             salida += ",";
             //System.out.println(salida);
             ino.sendData(salida);
+            control.setSelect(id);
+            select = id;
             ino.killArduinoConnection();
         } catch (ArduinoException | SerialPortException ex) {
-            mensaje("Error", ex.getMessage(), JOptionPane.ERROR_MESSAGE);
+            throw new Exception("No se pudo programar el dispositivo.");
         }
     }
     
@@ -379,18 +409,26 @@ public class Ventana extends javax.swing.JFrame {
         jList1 = new javax.swing.JList<>();
         lbContador = new javax.swing.JLabel();
         nTimbres = new javax.swing.JComboBox<>();
-        jLabel5 = new javax.swing.JLabel();
         jLabel7 = new javax.swing.JLabel();
         nDuracion = new javax.swing.JComboBox<>();
         jLabel8 = new javax.swing.JLabel();
+        jLabel13 = new javax.swing.JLabel();
         jPanel2 = new javax.swing.JPanel();
         jLabel6 = new javax.swing.JLabel();
         jSeparator3 = new javax.swing.JSeparator();
         jScrollPane1 = new javax.swing.JScrollPane();
         jTable1 = new javax.swing.JTable();
-        jScrollPane3 = new javax.swing.JScrollPane();
-        jTextArea1 = new javax.swing.JTextArea();
         jButton4 = new javax.swing.JButton();
+        jScrollPane4 = new javax.swing.JScrollPane();
+        tbHorario = new javax.swing.JTable();
+        jLabel9 = new javax.swing.JLabel();
+        jSeparator4 = new javax.swing.JSeparator();
+        jLabel10 = new javax.swing.JLabel();
+        jLabel11 = new javax.swing.JLabel();
+        jLabel12 = new javax.swing.JLabel();
+        lbLenDias = new javax.swing.JLabel();
+        lbId = new javax.swing.JLabel();
+        lbLenHoras = new javax.swing.JLabel();
         jPanel3 = new javax.swing.JPanel();
         timbre = new javax.swing.JButton();
         tiempo = new javax.swing.JLabel();
@@ -521,7 +559,7 @@ public class Ventana extends javax.swing.JFrame {
                 jButton1ActionPerformed(evt);
             }
         });
-        jPanel1.add(jButton1, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 190, 170, 30));
+        jPanel1.add(jButton1, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 190, 170, 40));
 
         jList1.setBackground(new java.awt.Color(36, 46, 52));
         jList1.setFont(new java.awt.Font("Segoe UI Light", 1, 14)); // NOI18N
@@ -531,7 +569,7 @@ public class Ventana extends javax.swing.JFrame {
         jList1.setSelectionBackground(new java.awt.Color(56, 96, 169));
         jScrollPane2.setViewportView(jList1);
 
-        jPanel1.add(jScrollPane2, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 230, 170, 190));
+        jPanel1.add(jScrollPane2, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 240, 170, 210));
 
         lbContador.setBackground(new java.awt.Color(255, 255, 255));
         lbContador.setFont(new java.awt.Font("Segoe UI Symbol", 1, 12)); // NOI18N
@@ -540,7 +578,7 @@ public class Ventana extends javax.swing.JFrame {
         lbContador.setText("0 de 20");
         lbContador.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
         lbContador.setHorizontalTextPosition(javax.swing.SwingConstants.LEADING);
-        jPanel1.add(lbContador, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 424, 170, 20));
+        jPanel1.add(lbContador, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 450, 170, 30));
 
         nTimbres.setBackground(new java.awt.Color(15, 65, 98));
         nTimbres.setFont(new java.awt.Font("Segoe UI Light", 1, 12)); // NOI18N
@@ -553,12 +591,6 @@ public class Ventana extends javax.swing.JFrame {
             }
         });
         jPanel1.add(nTimbres, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 150, 50, 30));
-
-        jLabel5.setFont(new java.awt.Font("Segoe UI Light", 1, 13)); // NOI18N
-        jLabel5.setForeground(new java.awt.Color(255, 255, 255));
-        jLabel5.setHorizontalAlignment(javax.swing.SwingConstants.LEFT);
-        jLabel5.setText("Sonará: ");
-        jPanel1.add(jLabel5, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 120, 60, 20));
 
         jLabel7.setFont(new java.awt.Font("Segoe UI Light", 1, 13)); // NOI18N
         jLabel7.setForeground(new java.awt.Color(255, 255, 255));
@@ -587,7 +619,13 @@ public class Ventana extends javax.swing.JFrame {
         jLabel8.setHorizontalTextPosition(javax.swing.SwingConstants.LEADING);
         jPanel1.add(jLabel8, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 40, 190, 30));
 
-        getContentPane().add(jPanel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 190, 450));
+        jLabel13.setFont(new java.awt.Font("Segoe UI Light", 1, 13)); // NOI18N
+        jLabel13.setForeground(new java.awt.Color(255, 255, 255));
+        jLabel13.setHorizontalAlignment(javax.swing.SwingConstants.LEFT);
+        jLabel13.setText("Sonará: ");
+        jPanel1.add(jLabel13, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 120, 60, 20));
+
+        getContentPane().add(jPanel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 190, 480));
 
         jPanel2.setBackground(new java.awt.Color(36, 46, 52));
         jPanel2.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
@@ -636,6 +674,8 @@ public class Ventana extends javax.swing.JFrame {
         jTable1.setRowHeight(20);
         jTable1.setSelectionBackground(new java.awt.Color(255, 204, 51));
         jTable1.setSelectionForeground(new java.awt.Color(1, 34, 57));
+        jTable1.getTableHeader().setResizingAllowed(false);
+        jTable1.getTableHeader().setReorderingAllowed(false);
         jTable1.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
                 jTable1MouseClicked(evt);
@@ -646,23 +686,12 @@ public class Ventana extends javax.swing.JFrame {
         });
         jScrollPane1.setViewportView(jTable1);
         if (jTable1.getColumnModel().getColumnCount() > 0) {
-            jTable1.getColumnModel().getColumn(0).setMinWidth(35);
-            jTable1.getColumnModel().getColumn(0).setMaxWidth(35);
+            jTable1.getColumnModel().getColumn(0).setMinWidth(50);
+            jTable1.getColumnModel().getColumn(0).setPreferredWidth(50);
+            jTable1.getColumnModel().getColumn(0).setMaxWidth(50);
         }
 
         jPanel2.add(jScrollPane1, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 40, 480, 100));
-
-        jTextArea1.setEditable(false);
-        jTextArea1.setBackground(new java.awt.Color(1, 34, 57));
-        jTextArea1.setColumns(20);
-        jTextArea1.setFont(new java.awt.Font("Segoe UI Light", 0, 14)); // NOI18N
-        jTextArea1.setForeground(new java.awt.Color(255, 204, 51));
-        jTextArea1.setRows(2);
-        jTextArea1.setBorder(null);
-        jTextArea1.setFocusable(false);
-        jScrollPane3.setViewportView(jTextArea1);
-
-        jPanel2.add(jScrollPane3, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 150, 480, 50));
 
         jButton4.setBackground(new java.awt.Color(255, 204, 51));
         jButton4.setFont(new java.awt.Font("Segoe UI Light", 1, 14)); // NOI18N
@@ -678,9 +707,118 @@ public class Ventana extends javax.swing.JFrame {
                 jButton4ActionPerformed(evt);
             }
         });
-        jPanel2.add(jButton4, new org.netbeans.lib.awtextra.AbsoluteConstraints(170, 210, 160, 40));
+        jPanel2.add(jButton4, new org.netbeans.lib.awtextra.AbsoluteConstraints(300, 240, 190, 40));
 
-        getContentPane().add(jPanel2, new org.netbeans.lib.awtextra.AbsoluteConstraints(190, 190, 500, 260));
+        tbHorario.setBackground(new java.awt.Color(1, 34, 57));
+        tbHorario.setFont(new java.awt.Font("Segoe UI Light", 0, 14)); // NOI18N
+        tbHorario.setForeground(new java.awt.Color(255, 204, 51));
+        tbHorario.setModel(new javax.swing.table.DefaultTableModel(
+            new Object [][] {
+
+            },
+            new String [] {
+                "---"
+            }
+        ) {
+            Class[] types = new Class [] {
+                java.lang.String.class
+            };
+            boolean[] canEdit = new boolean [] {
+                false
+            };
+
+            public Class getColumnClass(int columnIndex) {
+                return types [columnIndex];
+            }
+
+            public boolean isCellEditable(int rowIndex, int columnIndex) {
+                return canEdit [columnIndex];
+            }
+        });
+        tbHorario.setFocusable(false);
+        tbHorario.setRowHeight(20);
+        tbHorario.setSelectionBackground(new java.awt.Color(255, 204, 51));
+        tbHorario.setSelectionForeground(new java.awt.Color(1, 34, 57));
+        tbHorario.setShowHorizontalLines(false);
+        tbHorario.getTableHeader().setResizingAllowed(false);
+        tbHorario.getTableHeader().setReorderingAllowed(false);
+        tbHorario.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                tbHorarioMouseClicked(evt);
+            }
+            public void mousePressed(java.awt.event.MouseEvent evt) {
+                tbHorarioMousePressed(evt);
+            }
+        });
+        jScrollPane4.setViewportView(tbHorario);
+        if (tbHorario.getColumnModel().getColumnCount() > 0) {
+            tbHorario.getColumnModel().getColumn(0).setMinWidth(50);
+            tbHorario.getColumnModel().getColumn(0).setPreferredWidth(50);
+            tbHorario.getColumnModel().getColumn(0).setMaxWidth(50);
+        }
+
+        jPanel2.add(jScrollPane4, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 180, 280, 100));
+
+        jLabel9.setBackground(new java.awt.Color(255, 255, 255));
+        jLabel9.setFont(new java.awt.Font("Segoe UI Symbol", 1, 12)); // NOI18N
+        jLabel9.setForeground(new java.awt.Color(255, 204, 51));
+        jLabel9.setHorizontalAlignment(javax.swing.SwingConstants.LEFT);
+        jLabel9.setText("N° DÍAS:");
+        jLabel9.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
+        jLabel9.setHorizontalTextPosition(javax.swing.SwingConstants.LEADING);
+        jPanel2.add(jLabel9, new org.netbeans.lib.awtextra.AbsoluteConstraints(310, 210, 60, 20));
+
+        jSeparator4.setBackground(new java.awt.Color(255, 204, 51));
+        jSeparator4.setForeground(new java.awt.Color(255, 204, 51));
+        jSeparator4.setAlignmentY(2.0F);
+        jPanel2.add(jSeparator4, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 170, 170, 10));
+
+        jLabel10.setBackground(new java.awt.Color(255, 255, 255));
+        jLabel10.setFont(new java.awt.Font("Segoe UI Symbol", 1, 14)); // NOI18N
+        jLabel10.setForeground(new java.awt.Color(255, 204, 51));
+        jLabel10.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        jLabel10.setText("DETALLES DE HORARIO");
+        jLabel10.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
+        jLabel10.setHorizontalTextPosition(javax.swing.SwingConstants.LEADING);
+        jPanel2.add(jLabel10, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 140, 190, 30));
+
+        jLabel11.setBackground(new java.awt.Color(255, 255, 255));
+        jLabel11.setFont(new java.awt.Font("Segoe UI Symbol", 1, 12)); // NOI18N
+        jLabel11.setForeground(new java.awt.Color(255, 204, 51));
+        jLabel11.setHorizontalAlignment(javax.swing.SwingConstants.LEFT);
+        jLabel11.setText("ID:");
+        jLabel11.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
+        jLabel11.setHorizontalTextPosition(javax.swing.SwingConstants.LEADING);
+        jPanel2.add(jLabel11, new org.netbeans.lib.awtextra.AbsoluteConstraints(310, 170, 20, 20));
+
+        jLabel12.setBackground(new java.awt.Color(255, 255, 255));
+        jLabel12.setFont(new java.awt.Font("Segoe UI Symbol", 1, 12)); // NOI18N
+        jLabel12.setForeground(new java.awt.Color(255, 204, 51));
+        jLabel12.setHorizontalAlignment(javax.swing.SwingConstants.LEFT);
+        jLabel12.setText("N° HORAS:");
+        jLabel12.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
+        jLabel12.setHorizontalTextPosition(javax.swing.SwingConstants.LEADING);
+        jPanel2.add(jLabel12, new org.netbeans.lib.awtextra.AbsoluteConstraints(310, 190, 70, 20));
+
+        lbLenDias.setFont(new java.awt.Font("Segoe UI Light", 1, 13)); // NOI18N
+        lbLenDias.setForeground(new java.awt.Color(255, 255, 255));
+        lbLenDias.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        lbLenDias.setText("0");
+        jPanel2.add(lbLenDias, new org.netbeans.lib.awtextra.AbsoluteConstraints(360, 210, 20, 20));
+
+        lbId.setFont(new java.awt.Font("Segoe UI Light", 1, 13)); // NOI18N
+        lbId.setForeground(new java.awt.Color(255, 255, 255));
+        lbId.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        lbId.setText("0");
+        jPanel2.add(lbId, new org.netbeans.lib.awtextra.AbsoluteConstraints(330, 170, 10, 20));
+
+        lbLenHoras.setFont(new java.awt.Font("Segoe UI Light", 1, 13)); // NOI18N
+        lbLenHoras.setForeground(new java.awt.Color(255, 255, 255));
+        lbLenHoras.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        lbLenHoras.setText("0");
+        jPanel2.add(lbLenHoras, new org.netbeans.lib.awtextra.AbsoluteConstraints(380, 190, 10, 20));
+
+        getContentPane().add(jPanel2, new org.netbeans.lib.awtextra.AbsoluteConstraints(190, 190, 500, 290));
 
         jPanel3.setBackground(new java.awt.Color(1, 39, 65));
         jPanel3.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
@@ -985,7 +1123,7 @@ public class Ventana extends javax.swing.JFrame {
     }//GEN-LAST:event_jButton5ActionPerformed
 
     private void jTable1MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jTable1MouseClicked
-        jTextArea1.setText(horarios.get(jTable1.getSelectedRow()).toString());
+        listarHorario(jTable1.getSelectedRow());
         
     }//GEN-LAST:event_jTable1MouseClicked
 
@@ -994,14 +1132,9 @@ public class Ventana extends javax.swing.JFrame {
     }//GEN-LAST:event_jTable1MousePressed
 
     private void jButton4ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton4ActionPerformed
-        int id;
         try {
             if(jTable1.getSelectedRow()>-1){
-                pos = jTable1.getSelectedRow();
-                id = horarios.get(pos).getId();
                 enviarInformacion();
-                control.setSelect(id);
-                select = id;
             } else {
                 mensaje("ADVERTENCIA", "Debe seleccionar un horarios", JOptionPane.WARNING_MESSAGE);
             }
@@ -1057,6 +1190,14 @@ public class Ventana extends javax.swing.JFrame {
         // TODO add your handling code here:
     }//GEN-LAST:event_nDuracionActionPerformed
 
+    private void tbHorarioMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tbHorarioMouseClicked
+        // TODO add your handling code here:
+    }//GEN-LAST:event_tbHorarioMouseClicked
+
+    private void tbHorarioMousePressed(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tbHorarioMousePressed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_tbHorarioMousePressed
+
     /**
      * @param args the command line arguments
      */
@@ -1078,11 +1219,15 @@ public class Ventana extends javax.swing.JFrame {
     private javax.swing.JButton jButton4;
     private javax.swing.JButton jButton5;
     private javax.swing.JLabel jLabel1;
+    private javax.swing.JLabel jLabel10;
+    private javax.swing.JLabel jLabel11;
+    private javax.swing.JLabel jLabel12;
+    private javax.swing.JLabel jLabel13;
     private javax.swing.JLabel jLabel2;
-    private javax.swing.JLabel jLabel5;
     private javax.swing.JLabel jLabel6;
     private javax.swing.JLabel jLabel7;
     private javax.swing.JLabel jLabel8;
+    private javax.swing.JLabel jLabel9;
     private javax.swing.JList<String> jList1;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
@@ -1091,14 +1236,17 @@ public class Ventana extends javax.swing.JFrame {
     private javax.swing.JScrollBar jScrollBar1;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane2;
-    private javax.swing.JScrollPane jScrollPane3;
+    private javax.swing.JScrollPane jScrollPane4;
     private javax.swing.JSeparator jSeparator1;
     private javax.swing.JSeparator jSeparator2;
     private javax.swing.JSeparator jSeparator3;
+    private javax.swing.JSeparator jSeparator4;
     private javax.swing.JTable jTable1;
-    private javax.swing.JTextArea jTextArea1;
     private javax.swing.JCheckBox jueves;
     private javax.swing.JLabel lbContador;
+    private javax.swing.JLabel lbId;
+    private javax.swing.JLabel lbLenDias;
+    private javax.swing.JLabel lbLenHoras;
     private javax.swing.JCheckBox lunes;
     private javax.swing.JCheckBox martes;
     private javax.swing.JCheckBox miercoles;
@@ -1112,6 +1260,7 @@ public class Ventana extends javax.swing.JFrame {
     private javax.swing.JCheckBox sabado;
     private javax.swing.JSpinner sp1;
     private javax.swing.JSpinner sp2;
+    private javax.swing.JTable tbHorario;
     private javax.swing.JLabel tiempo;
     private javax.swing.JButton timbre;
     private javax.swing.JCheckBox viernes;
