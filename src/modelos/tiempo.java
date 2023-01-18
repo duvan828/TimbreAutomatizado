@@ -5,12 +5,14 @@ public class tiempo {
     private int minutos;
     private int momento;
     private int repeticiones;
+    private int duracion;
 
     public tiempo() {
         hora = 0;
         minutos = 0;
         momento = 0;
         repeticiones = 0;
+        duracion = 0;
     }
 
     public int getHora() {
@@ -44,6 +46,15 @@ public class tiempo {
     public void setRepeticiones(int repeticiones) {
         this.repeticiones = repeticiones;
     }
+
+    public int getDuracion() {
+        return duracion;
+    }
+
+    public void setDuracion(int duracion) {
+        this.duracion = duracion;
+    }
+    
     
     public String toString(){
        String h = ""+hora, m = ""+minutos, mom = "";
@@ -56,6 +67,6 @@ public class tiempo {
        if(momento==0) mom = "AM";
        else mom = "PM";
        
-        return h+":"+m+mom+"-"+repeticiones;
+        return h+":"+m+mom+" ("+repeticiones+","+duracion+")";
     }
 }

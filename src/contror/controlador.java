@@ -88,6 +88,7 @@ public class controlador {
             obj.put("minutos", tm.getMinutos()+"");
             obj.put("momento", tm.getMomento()+"");
             obj.put("repeticiones", tm.getRepeticiones()+"");
+            obj.put("duracion", tm.getDuracion()+"");
             horas.add(obj);
         }
         for (int i = 0; i < hr.getDias().len(); i++) {
@@ -125,6 +126,7 @@ public class controlador {
             obj.put("minutos", tm.getMinutos()+"");
             obj.put("momento", tm.getMomento()+"");
             obj.put("repeticiones", tm.getRepeticiones()+"");
+            obj.put("duracion", tm.getDuracion()+"");
             horas.add(obj);
         }
         for (int i = 0; i < hr.getDias().len(); i++) {
@@ -140,9 +142,9 @@ public class controlador {
             int s = Integer.parseInt((String) cuerpo.get("select"));
             if(s>-1){
                 return s;
-            } else return -1;
+            }
         } 
-        else return -1;
+        return -1;
     }
     
     public void setSelect(int n){
@@ -183,6 +185,7 @@ public class controlador {
                     tm.setMinutos(number((String) TIME.get("minutos")));
                     tm.setMomento(number((String) TIME.get("momento")));
                     tm.setRepeticiones(number((String) TIME.get("repeticiones")));
+                    tm.setDuracion(number((String) TIME.get("duracion")));
                     tms.add(tm);
                 }
                 for (int j = 0; j < DAYS.size(); j++) {

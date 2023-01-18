@@ -23,6 +23,7 @@ public class editarHorario extends javax.swing.JFrame {
         jSlider1.setValue(HR.getHoras().get(pos).getMinutos());
         moment1.setSelectedIndex(HR.getHoras().get(pos).getMomento());
         nTimbres1.setSelectedIndex(HR.getHoras().get(pos).getRepeticiones()-1);
+        nDuracion1.setSelectedIndex(HR.getHoras().get(pos).getDuracion()-1);
         jList2.setSelectedIndex(pos);
     }
     
@@ -69,6 +70,7 @@ public class editarHorario extends javax.swing.JFrame {
             time.setMinutos((int) jSlider1.getValue());
             time.setMomento(moment1.getSelectedIndex());
             time.setRepeticiones(nTimbres1.getSelectedIndex()+1);
+            time.setDuracion(nDuracion1.getSelectedIndex()+1);
             HR.getHoras().add(time);
             listEdit.addElement(time.toString());
         } catch (Exception e) {
@@ -124,7 +126,6 @@ public class editarHorario extends javax.swing.JFrame {
         jScrollPane4 = new javax.swing.JScrollPane();
         jList2 = new javax.swing.JList<>();
         lbMin = new javax.swing.JLabel();
-        jLabel9 = new javax.swing.JLabel();
         nTimbres1 = new javax.swing.JComboBox<>();
         jLabel10 = new javax.swing.JLabel();
         jSlider1 = new javax.swing.JSlider();
@@ -132,6 +133,8 @@ public class editarHorario extends javax.swing.JFrame {
         lbHora = new javax.swing.JLabel();
         jSlider2 = new javax.swing.JSlider();
         addCheck = new javax.swing.JCheckBox();
+        nDuracion1 = new javax.swing.JComboBox<>();
+        jLabel13 = new javax.swing.JLabel();
         jPanel6 = new javax.swing.JPanel();
         jSeparator5 = new javax.swing.JSeparator();
         jLabel11 = new javax.swing.JLabel();
@@ -243,11 +246,6 @@ public class editarHorario extends javax.swing.JFrame {
         lbMin.setHorizontalTextPosition(javax.swing.SwingConstants.LEADING);
         jPanel5.add(lbMin, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 120, 30, 20));
 
-        jLabel9.setFont(new java.awt.Font("Segoe UI Light", 1, 13)); // NOI18N
-        jLabel9.setForeground(new java.awt.Color(255, 255, 255));
-        jLabel9.setText("vez.");
-        jPanel5.add(jLabel9, new org.netbeans.lib.awtextra.AbsoluteConstraints(180, 150, 50, 30));
-
         nTimbres1.setBackground(new java.awt.Color(1, 34, 57));
         nTimbres1.setFont(new java.awt.Font("Segoe UI Light", 1, 12)); // NOI18N
         nTimbres1.setForeground(new java.awt.Color(255, 255, 255));
@@ -257,13 +255,13 @@ public class editarHorario extends javax.swing.JFrame {
                 nTimbres1ActionPerformed(evt);
             }
         });
-        jPanel5.add(nTimbres1, new org.netbeans.lib.awtextra.AbsoluteConstraints(120, 150, 50, 30));
+        jPanel5.add(nTimbres1, new org.netbeans.lib.awtextra.AbsoluteConstraints(80, 150, 50, 30));
 
         jLabel10.setFont(new java.awt.Font("Segoe UI Light", 1, 13)); // NOI18N
         jLabel10.setForeground(new java.awt.Color(255, 255, 255));
         jLabel10.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
         jLabel10.setText("Sonará: ");
-        jPanel5.add(jLabel10, new org.netbeans.lib.awtextra.AbsoluteConstraints(60, 150, 60, 30));
+        jPanel5.add(jLabel10, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 150, 60, 30));
 
         jSlider1.setBackground(new java.awt.Color(1, 34, 57));
         jSlider1.setForeground(new java.awt.Color(255, 204, 51));
@@ -326,6 +324,23 @@ public class editarHorario extends javax.swing.JFrame {
             }
         });
         jPanel5.add(addCheck, new org.netbeans.lib.awtextra.AbsoluteConstraints(290, 10, 140, -1));
+
+        nDuracion1.setBackground(new java.awt.Color(1, 34, 57));
+        nDuracion1.setFont(new java.awt.Font("Segoe UI Light", 1, 12)); // NOI18N
+        nDuracion1.setForeground(new java.awt.Color(255, 255, 255));
+        nDuracion1.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "1", "2", "3", "4" }));
+        nDuracion1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                nDuracion1ActionPerformed(evt);
+            }
+        });
+        jPanel5.add(nDuracion1, new org.netbeans.lib.awtextra.AbsoluteConstraints(220, 150, 50, 30));
+
+        jLabel13.setFont(new java.awt.Font("Segoe UI Light", 1, 13)); // NOI18N
+        jLabel13.setForeground(new java.awt.Color(255, 255, 255));
+        jLabel13.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
+        jLabel13.setText("Duración:");
+        jPanel5.add(jLabel13, new org.netbeans.lib.awtextra.AbsoluteConstraints(140, 150, 70, 30));
 
         getContentPane().add(jPanel5, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 460, 240));
 
@@ -501,8 +516,6 @@ public class editarHorario extends javax.swing.JFrame {
     }//GEN-LAST:event_agregarEditActionPerformed
 
     private void nTimbres1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_nTimbres1ActionPerformed
-        if(nTimbres1.getSelectedIndex()>0) jLabel9.setText("veces.");
-        else jLabel9.setText("vez.");
         if(!addCheck.isSelected()){
             HR.getHoras().get(pos).setRepeticiones(nTimbres1.getSelectedIndex()+1);
             listarTiempos();
@@ -613,6 +626,13 @@ public class editarHorario extends javax.swing.JFrame {
         listarTiempos();
     }//GEN-LAST:event_eliminarTodoActionPerformed
 
+    private void nDuracion1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_nDuracion1ActionPerformed
+        if(!addCheck.isSelected()){
+            HR.getHoras().get(pos).setDuracion(nDuracion1.getSelectedIndex()+1);
+            listarTiempos();
+        }
+    }//GEN-LAST:event_nDuracion1ActionPerformed
+
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JCheckBox addCheck;
@@ -625,7 +645,7 @@ public class editarHorario extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel10;
     private javax.swing.JLabel jLabel11;
     private javax.swing.JLabel jLabel12;
-    private javax.swing.JLabel jLabel9;
+    private javax.swing.JLabel jLabel13;
     private javax.swing.JList<String> jList2;
     private javax.swing.JPanel jPanel5;
     private javax.swing.JPanel jPanel6;
@@ -642,6 +662,7 @@ public class editarHorario extends javax.swing.JFrame {
     private javax.swing.JCheckBox martes1;
     private javax.swing.JCheckBox miercoles1;
     private javax.swing.JComboBox<String> moment1;
+    private javax.swing.JComboBox<String> nDuracion1;
     private javax.swing.JComboBox<String> nTimbres1;
     private javax.swing.JCheckBox sabado1;
     private javax.swing.JLabel titulo;

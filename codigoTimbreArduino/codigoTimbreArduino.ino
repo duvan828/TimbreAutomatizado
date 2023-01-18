@@ -1,11 +1,12 @@
 //Vectores que usaremos para el manejo de los horarios que se guardarán en el Arduino
 String lista[] = {"", "", "", "", "", "", "", ""};
 String listaHoras[] = {"","","","","","","","","","","","","","","","","","","","",""};
-String datosHora[] = {"","","","",""};
-int horas[] = {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
-int minutos[] = {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
-int momentos[] = {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
-int timbres[] = {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
+String datosHora[] = {"","","","","",""};
+int horas[] = {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
+int minutos[] = {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
+int momentos[] = {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
+int timbres[] = {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
+int duracion[] = {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
 int dias[] = {0,0,0,0,0,0,0,0};
 //Largo de la lista de horas y días que sonará
 int lenHoras = 0;
@@ -16,6 +17,7 @@ int min = -1;
 int seg = -1;
 int dia = 0;
 int toques = -1;
+int segDuracion = 3;
 int mom = -1;
 bool estado = false;
 int contSeg = 0;
@@ -66,6 +68,7 @@ void cargarDatos(){
     minutos[i] = datosHora[1].toInt();
     momentos[i] = datosHora[2].toInt();
     timbres[i] = datosHora[3].toInt();
+    duracion[i] = datosHora[4].toInt();
     i++;
   }
   lenHoras = i;
@@ -77,6 +80,7 @@ bool comprobarHora(int h, int m, int moment, int d){
           for (int j = 0; j < lenDias; j++) {
               if(d==dias[j]){
                   toques = timbres[i];
+                  segDuracion = duracion[i];
                   return true;
               }
           }
@@ -102,12 +106,7 @@ void loop() {
       Serial.println("Timbre Apagado.");
     } else if (accion.equals("2")){
       cargarDatos();
-      Serial.print(hora);
-      Serial.print(":");
-      Serial.print(min);
-      Serial.print(":");
-      Serial.print(seg);
-      Serial.println(" hora " + listaHoras[0]);
+      Serial.println("Timbre programado.");
     }
   }
 
@@ -144,10 +143,8 @@ void loop() {
       }
       if(contSeg==1){
         digitalWrite(8, LOW);
-        Serial.println("Timbre Encendido.");
-      } else if (contSeg==3){
+      } else if (contSeg==segDuracion){
         digitalWrite(8, HIGH);
-        Serial.println("Timbre Apagado.");
       }
       delay(1000);
     }
