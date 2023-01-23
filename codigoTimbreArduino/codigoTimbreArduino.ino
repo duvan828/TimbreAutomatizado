@@ -1,3 +1,8 @@
+//Libreria LCD
+#include <LiquidCrystal_I2C.h>
+
+LiquidCrystal_I2C lcd(0x27, 16, 2);
+
 //Vectores que usaremos para el manejo de los horarios que se guardarán en el Arduino
 String lista[] = {"", "", "", "", "", "", "", ""};
 String listaHoras[] = {"","","","","","","","","","","","","","","","","","","","",""};
@@ -20,12 +25,35 @@ int toques = -1;
 int segDuracion = 3;
 int mom = -1;
 bool estado = false;
-int contSeg = 0;
+int contSeg = -1;
+int sig = 0;
+int contList = 2;
+
+void limpiarListas(){
+  for(int i = 0; i < lenHoras; i++){
+    listaHoras[i] = "";
+    horas[i] = 0;
+    minutos[i] = 0;
+    momentos[i] = 0;
+    timbres[i] = 0;
+    duracion[i] = 0;
+  }
+  for(int i = 0; i < lenDias; i++){
+    dias[i] = 0;
+  }
+}
 
 void setup() {
   pinMode(8, OUTPUT);
   Serial.begin(9600);
   digitalWrite(8, HIGH);
+  lcd.init();
+  lcd.backlight();
+  lcd.clear();
+  lcd.setCursor(0,0);
+  lcd.print("EL TIMBRE NO");
+  lcd.setCursor(0, 1);
+  lcd.print("ESTA PROGRAMADO");
 }
 void split(String lst[], String cadena, String sep) {
   int inicio = 0;
@@ -52,6 +80,7 @@ void splitNumbers(String cadena, String sep) {
 }
 
 void cargarDatos(){
+  limpiarListas();
   hora = lista[1].toInt();
   min = lista[2].toInt();
   seg = lista[3].toInt();
@@ -100,12 +129,11 @@ void loop() {
     }
     if (accion.equals("1")) {
       digitalWrite(8, LOW);
-      Serial.println("Timbre Encendido.");
     } else if (accion.equals("0")) {
       digitalWrite(8, HIGH);
-      Serial.println("Timbre Apagado.");
     } else if (accion.equals("2")){
       cargarDatos();
+      lcd.clear();
       Serial.println("Timbre programado.");
     }
   }
@@ -114,11 +142,12 @@ void loop() {
     if(hora>-1&&min>-1&&seg>-1){
       if(seg<59){
         seg++;
-        if(contSeg<3&&toques>0&&estado){
+        if(contSeg<segDuracion&&toques>0&&estado){
             contSeg++;
+            //if(contSeg==5) segDuracion = contSeg;
         }
-        else if(estado&&contSeg==3){
-            contSeg=0;
+        else if(estado&&contSeg==segDuracion){
+            contSeg=-1;
             toques--;
         }
       }
@@ -141,11 +170,70 @@ void loop() {
           }
         }
       }
-      if(contSeg==1){
+      if(contSeg==0){
         digitalWrite(8, LOW);
-      } else if (contSeg==segDuracion){
+      } else if (contSeg==segDuracion||contSeg==5){
         digitalWrite(8, HIGH);
       }
-      delay(1000);
+      lcd.setCursor(0,0);
+      lcd.print(agregarCero(hora));
+      lcd.setCursor(2,0);
+      lcd.print(":");
+      lcd.setCursor(3,0);
+      lcd.print(agregarCero(min));
+      lcd.setCursor(5,0);
+      lcd.print(":");
+      lcd.setCursor(6,0);
+      lcd.print(agregarCero(seg));
+      lcd.setCursor(9,0);
+      lcd.print(momento(mom));
+      lcd.setCursor(12, 0);
+      lcd.print(diaSem(dia));
+      if(contList==2){
+        if(horas[sig]>0){
+          lcd.setCursor(0,1);
+          lcd.print("Horas: ");
+          lcd.setCursor(7,1);
+          lcd.print(agregarCero(horas[sig]));
+          lcd.setCursor(9,1);
+          lcd.print(":");
+          lcd.setCursor(10,1);
+          lcd.print(agregarCero(minutos[sig]));
+          lcd.setCursor(12,1);
+          lcd.print(momento(momentos[sig]));
+          sig++;
+          contList = 0;
+        } else sig = 0;
+      } else contList++;
+      delay(990);
     }
+    
+}
+
+String momento(int m){
+  if(m==0) return "AM";
+  else return "PM";
+}
+
+String diaSem(int d){
+  String salida = "";
+  switch(d){
+    case 1: salida = "Dom"; break; 
+    case 2: salida = "Lun"; break; 
+    case 3: salida = "Mar"; break; 
+    case 4: salida = "Mie"; break; 
+    case 5: salida = "Jue"; break; 
+    case 6: salida = "Vie"; break; 
+    case 7: salida = "Sab"; break; 
+  }
+  return salida;
+}
+
+String agregarCero(int n){
+  String salida = "";
+  if(n<10) {
+    salida = "0";
+  }
+  salida.concat(n);
+  return salida;
 }

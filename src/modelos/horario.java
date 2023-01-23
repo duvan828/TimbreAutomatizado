@@ -4,11 +4,13 @@ import listas.*;
 public class horario {
     
     private int id;
+    private String nombre;
     private listaTiempos horas;
     private listaDias dias;
 
     public horario(){
         id = 0;
+        nombre = "";
         horas = new listaTiempos();
         dias = new listaDias();
     }
@@ -26,6 +28,17 @@ public class horario {
     public int getId(){
         return id;
     }
+
+    public String getNombre() {
+        return nombre;
+    }
+
+    public void setNombre(String nombre) {
+        if(!nombre.equals(""))  this.nombre = nombre;
+        else this.nombre = "Horario "+ id;
+    }
+    
+    
     
     private int generarID(listaHorarios lst) {
         int idGen = 1;

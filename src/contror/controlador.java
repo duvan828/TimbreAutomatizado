@@ -61,21 +61,14 @@ public class controlador {
         return (JSONArray) cuerpo.get("horarios");
     }
     
-    private void setHorario(int id, JSONArray horas, JSONArray dias){
+    private void setHorario(int id, String nombre, JSONArray horas, JSONArray dias){
         JSONObject horario = new JSONObject();
         JSONArray horarios = (JSONArray) cuerpo.get("horarios");
         horario.put("id", id+"");
+        horario.put("nombre", nombre);
         horario.put("horas", horas);
         horario.put("dias", dias);
         horarios.add(horario);
-    }
-    
-    private JSONObject getEditHorario(int id, JSONArray horas, JSONArray dias){
-        JSONObject horario = (JSONObject) new JSONObject();
-        horario.put("id", id);
-        horario.put("horas", horas);
-        horario.put("dias", dias);
-        return horario;
     }
     
     public void saveHorario(horario hr){
@@ -95,11 +88,11 @@ public class controlador {
             int dia = hr.getDias().get(i);
             dias.add(dia+"");
         }
-        setHorario(hr.getId(), horas, dias);
+        setHorario(hr.getId(),hr.getNombre(), horas, dias);
         guardarDatos();
     }
     
-    private void reescribirHorarios(int id, JSONArray horas, JSONArray dias){
+    private void reescribirHorarios(int id, String nombre, JSONArray horas, JSONArray dias){
         JSONArray datos = getHotarios();
         JSONArray hr = new JSONArray();
         cuerpo.clear();
@@ -109,6 +102,7 @@ public class controlador {
             if(Integer.parseInt((String)obj.get("id")) == id){
                 JSONObject nuevo = new JSONObject();
                 nuevo.put("id", id+"");
+                nuevo.put("nombre", nombre);
                 nuevo.put("horas", horas);
                 nuevo.put("dias", dias);
                 hr.add(nuevo);
@@ -133,7 +127,7 @@ public class controlador {
             int dia = hr.getDias().get(i);
             dias.add(dia+"");
         }
-        reescribirHorarios(hr.getId(), horas, dias);
+        reescribirHorarios(hr.getId(), hr.getNombre(), horas, dias);
         guardarDatos();
     }
     
@@ -160,6 +154,7 @@ public class controlador {
         JSONArray hrs = getHotarios();
         JSONObject hr;
         int id;
+        String nombre;
         JSONArray TIMES;
         JSONObject TIME;
         JSONArray DAYS;
@@ -174,7 +169,8 @@ public class controlador {
                 hr = (JSONObject) hrs.get(i);
                 horario = new horario();
                 id = number((String) hr.get("id"));
-                TIMES = (JSONArray) hr.get("horas");
+                nombre = (String) hr.get("nombre");
+                 TIMES = (JSONArray) hr.get("horas");
                 DAYS = (JSONArray) hr.get("dias");
                 tms = new listaTiempos();
                 days = new listaDias();
@@ -192,6 +188,7 @@ public class controlador {
                     days.add(number((String) DAYS.get(j)));
                 }
                 horario.setId(id);
+                horario.setNombre(nombre);
                 horario.setHoras(tms);
                 horario.setDias(days);
                 horarios.add(horario);

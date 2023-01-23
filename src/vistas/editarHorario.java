@@ -19,6 +19,7 @@ public class editarHorario extends javax.swing.JFrame {
     }
     
     private void datosHoras(int pos){
+        lbNombre.setText(HR.getNombre());
         jSlider2.setValue(HR.getHoras().get(pos).getHora());
         jSlider1.setValue(HR.getHoras().get(pos).getMinutos());
         moment1.setSelectedIndex(HR.getHoras().get(pos).getMomento());
@@ -106,8 +107,7 @@ public class editarHorario extends javax.swing.JFrame {
        allCheck1.setSelected(false);
        listEdit.setSize(0);
        nTimbres1.setSelectedIndex(0);
-       HR = null;
-       frame = null;
+       nDuracion1.setSelectedIndex(0);
        addCheck.setSelected(false);
    }
     
@@ -147,6 +147,9 @@ public class editarHorario extends javax.swing.JFrame {
         domingo1 = new javax.swing.JCheckBox();
         jButton6 = new javax.swing.JButton();
         allCheck1 = new javax.swing.JCheckBox();
+        lbNombre = new javax.swing.JTextField();
+        jLabel3 = new javax.swing.JLabel();
+        jSeparator6 = new javax.swing.JSeparator();
 
         eliminar.setBackground(new java.awt.Color(6, 34, 52));
         eliminar.setFont(new java.awt.Font("Segoe UI Light", 0, 14)); // NOI18N
@@ -178,19 +181,19 @@ public class editarHorario extends javax.swing.JFrame {
         jPanel5.setBackground(new java.awt.Color(1, 34, 57));
         jPanel5.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
-        titulo.setFont(new java.awt.Font("Segoe UI Light", 1, 18)); // NOI18N
+        titulo.setFont(new java.awt.Font("Segoe UI Light", 1, 30)); // NOI18N
         titulo.setForeground(new java.awt.Color(255, 255, 255));
         titulo.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         titulo.setText("EDITAR HORARIO");
-        jPanel5.add(titulo, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 280, 30));
+        jPanel5.add(titulo, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 10, 340, 30));
 
         jSeparator4.setBackground(new java.awt.Color(255, 204, 51));
         jSeparator4.setForeground(new java.awt.Color(255, 204, 51));
         jSeparator4.setAlignmentY(2.0F);
-        jPanel5.add(jSeparator4, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 70, 270, 10));
+        jPanel5.add(jSeparator4, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 80, 320, 10));
 
         moment1.setBackground(new java.awt.Color(15, 65, 98));
-        moment1.setFont(new java.awt.Font("Segoe UI Light", 1, 12)); // NOI18N
+        moment1.setFont(new java.awt.Font("Segoe UI Light", 1, 18)); // NOI18N
         moment1.setForeground(new java.awt.Color(255, 255, 255));
         moment1.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "AM", "PM" }));
         moment1.setBorder(null);
@@ -200,13 +203,13 @@ public class editarHorario extends javax.swing.JFrame {
                 moment1ActionPerformed(evt);
             }
         });
-        jPanel5.add(moment1, new org.netbeans.lib.awtextra.AbsoluteConstraints(230, 100, -1, 30));
+        jPanel5.add(moment1, new org.netbeans.lib.awtextra.AbsoluteConstraints(270, 100, -1, 30));
 
         agregarEdit.setBackground(new java.awt.Color(23, 83, 123));
-        agregarEdit.setFont(new java.awt.Font("Segoe UI Light", 1, 14)); // NOI18N
+        agregarEdit.setFont(new java.awt.Font("Segoe UI Light", 1, 18)); // NOI18N
         agregarEdit.setForeground(new java.awt.Color(255, 255, 255));
         agregarEdit.setIcon(new javax.swing.ImageIcon(getClass().getResource("/img/agregar.png"))); // NOI18N
-        agregarEdit.setText("AGREGAR");
+        agregarEdit.setText("AGREGAR HORA");
         agregarEdit.setBorder(null);
         agregarEdit.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
         agregarEdit.setEnabled(false);
@@ -217,10 +220,10 @@ public class editarHorario extends javax.swing.JFrame {
                 agregarEditActionPerformed(evt);
             }
         });
-        jPanel5.add(agregarEdit, new org.netbeans.lib.awtextra.AbsoluteConstraints(60, 190, 170, 40));
+        jPanel5.add(agregarEdit, new org.netbeans.lib.awtextra.AbsoluteConstraints(80, 210, 190, 40));
 
         jList2.setBackground(new java.awt.Color(36, 46, 52));
-        jList2.setFont(new java.awt.Font("Segoe UI Light", 1, 14)); // NOI18N
+        jList2.setFont(new java.awt.Font("Segoe UI Light", 1, 16)); // NOI18N
         jList2.setForeground(new java.awt.Color(255, 204, 51));
         jList2.setSelectionMode(javax.swing.ListSelectionModel.SINGLE_SELECTION);
         jList2.setComponentPopupMenu(listaMenu);
@@ -235,10 +238,10 @@ public class editarHorario extends javax.swing.JFrame {
         });
         jScrollPane4.setViewportView(jList2);
 
-        jPanel5.add(jScrollPane4, new org.netbeans.lib.awtextra.AbsoluteConstraints(290, 40, 160, 190));
+        jPanel5.add(jScrollPane4, new org.netbeans.lib.awtextra.AbsoluteConstraints(340, 40, 270, 220));
 
         lbMin.setBackground(new java.awt.Color(255, 255, 255));
-        lbMin.setFont(new java.awt.Font("Segoe UI Symbol", 1, 14)); // NOI18N
+        lbMin.setFont(new java.awt.Font("Segoe UI Light", 1, 18)); // NOI18N
         lbMin.setForeground(new java.awt.Color(255, 204, 51));
         lbMin.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         lbMin.setText("30");
@@ -247,7 +250,7 @@ public class editarHorario extends javax.swing.JFrame {
         jPanel5.add(lbMin, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 120, 30, 20));
 
         nTimbres1.setBackground(new java.awt.Color(1, 34, 57));
-        nTimbres1.setFont(new java.awt.Font("Segoe UI Light", 1, 12)); // NOI18N
+        nTimbres1.setFont(new java.awt.Font("Segoe UI Light", 1, 18)); // NOI18N
         nTimbres1.setForeground(new java.awt.Color(255, 255, 255));
         nTimbres1.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "1", "2", "3", "4" }));
         nTimbres1.addActionListener(new java.awt.event.ActionListener() {
@@ -255,13 +258,13 @@ public class editarHorario extends javax.swing.JFrame {
                 nTimbres1ActionPerformed(evt);
             }
         });
-        jPanel5.add(nTimbres1, new org.netbeans.lib.awtextra.AbsoluteConstraints(80, 150, 50, 30));
+        jPanel5.add(nTimbres1, new org.netbeans.lib.awtextra.AbsoluteConstraints(100, 150, 50, 30));
 
-        jLabel10.setFont(new java.awt.Font("Segoe UI Light", 1, 13)); // NOI18N
+        jLabel10.setFont(new java.awt.Font("Segoe UI Light", 1, 18)); // NOI18N
         jLabel10.setForeground(new java.awt.Color(255, 255, 255));
         jLabel10.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
-        jLabel10.setText("Sonará: ");
-        jPanel5.add(jLabel10, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 150, 60, 30));
+        jLabel10.setText("Toques:");
+        jPanel5.add(jLabel10, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 150, 70, 30));
 
         jSlider1.setBackground(new java.awt.Color(1, 34, 57));
         jSlider1.setForeground(new java.awt.Color(255, 204, 51));
@@ -276,19 +279,19 @@ public class editarHorario extends javax.swing.JFrame {
                 jSlider1StateChanged(evt);
             }
         });
-        jPanel5.add(jSlider1, new org.netbeans.lib.awtextra.AbsoluteConstraints(50, 120, 170, 20));
+        jPanel5.add(jSlider1, new org.netbeans.lib.awtextra.AbsoluteConstraints(50, 120, 210, 20));
 
         jLabel12.setBackground(new java.awt.Color(255, 255, 255));
-        jLabel12.setFont(new java.awt.Font("Segoe UI Symbol", 1, 14)); // NOI18N
+        jLabel12.setFont(new java.awt.Font("Segoe UI Symbol", 1, 24)); // NOI18N
         jLabel12.setForeground(new java.awt.Color(255, 204, 51));
         jLabel12.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         jLabel12.setText("HORAS");
         jLabel12.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
         jLabel12.setHorizontalTextPosition(javax.swing.SwingConstants.LEADING);
-        jPanel5.add(jLabel12, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 40, 280, 30));
+        jPanel5.add(jLabel12, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 50, 330, 30));
 
         lbHora.setBackground(new java.awt.Color(255, 255, 255));
-        lbHora.setFont(new java.awt.Font("Segoe UI Symbol", 1, 14)); // NOI18N
+        lbHora.setFont(new java.awt.Font("Segoe UI Light", 1, 18)); // NOI18N
         lbHora.setForeground(new java.awt.Color(255, 204, 51));
         lbHora.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         lbHora.setText("12");
@@ -308,10 +311,10 @@ public class editarHorario extends javax.swing.JFrame {
                 jSlider2StateChanged(evt);
             }
         });
-        jPanel5.add(jSlider2, new org.netbeans.lib.awtextra.AbsoluteConstraints(50, 90, 170, 20));
+        jPanel5.add(jSlider2, new org.netbeans.lib.awtextra.AbsoluteConstraints(50, 90, 210, 20));
 
         addCheck.setBackground(new java.awt.Color(1, 34, 57));
-        addCheck.setFont(new java.awt.Font("Segoe UI Light", 1, 14)); // NOI18N
+        addCheck.setFont(new java.awt.Font("Segoe UI Light", 1, 18)); // NOI18N
         addCheck.setForeground(new java.awt.Color(255, 255, 255));
         addCheck.setText("Agregar nuevo");
         addCheck.setBorder(null);
@@ -323,10 +326,10 @@ public class editarHorario extends javax.swing.JFrame {
                 addCheckActionPerformed(evt);
             }
         });
-        jPanel5.add(addCheck, new org.netbeans.lib.awtextra.AbsoluteConstraints(290, 10, 140, -1));
+        jPanel5.add(addCheck, new org.netbeans.lib.awtextra.AbsoluteConstraints(350, 10, 160, -1));
 
         nDuracion1.setBackground(new java.awt.Color(1, 34, 57));
-        nDuracion1.setFont(new java.awt.Font("Segoe UI Light", 1, 12)); // NOI18N
+        nDuracion1.setFont(new java.awt.Font("Segoe UI Light", 1, 18)); // NOI18N
         nDuracion1.setForeground(new java.awt.Color(255, 255, 255));
         nDuracion1.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "1", "2", "3", "4" }));
         nDuracion1.addActionListener(new java.awt.event.ActionListener() {
@@ -334,15 +337,15 @@ public class editarHorario extends javax.swing.JFrame {
                 nDuracion1ActionPerformed(evt);
             }
         });
-        jPanel5.add(nDuracion1, new org.netbeans.lib.awtextra.AbsoluteConstraints(220, 150, 50, 30));
+        jPanel5.add(nDuracion1, new org.netbeans.lib.awtextra.AbsoluteConstraints(280, 150, 50, 30));
 
-        jLabel13.setFont(new java.awt.Font("Segoe UI Light", 1, 13)); // NOI18N
+        jLabel13.setFont(new java.awt.Font("Segoe UI Light", 1, 18)); // NOI18N
         jLabel13.setForeground(new java.awt.Color(255, 255, 255));
         jLabel13.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
-        jLabel13.setText("Duración:");
-        jPanel5.add(jLabel13, new org.netbeans.lib.awtextra.AbsoluteConstraints(140, 150, 70, 30));
+        jLabel13.setText("Tiempo (s):");
+        jPanel5.add(jLabel13, new org.netbeans.lib.awtextra.AbsoluteConstraints(170, 150, 100, 30));
 
-        getContentPane().add(jPanel5, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 460, 240));
+        getContentPane().add(jPanel5, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 620, 270));
 
         jPanel6.setBackground(new java.awt.Color(1, 45, 75));
         jPanel6.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
@@ -350,19 +353,19 @@ public class editarHorario extends javax.swing.JFrame {
         jSeparator5.setBackground(new java.awt.Color(255, 204, 51));
         jSeparator5.setForeground(new java.awt.Color(255, 204, 51));
         jSeparator5.setOrientation(javax.swing.SwingConstants.VERTICAL);
-        jPanel6.add(jSeparator5, new org.netbeans.lib.awtextra.AbsoluteConstraints(60, 10, 10, 50));
+        jPanel6.add(jSeparator5, new org.netbeans.lib.awtextra.AbsoluteConstraints(120, 10, 10, 50));
 
         jLabel11.setBackground(new java.awt.Color(255, 255, 255));
-        jLabel11.setFont(new java.awt.Font("Segoe UI Symbol", 1, 14)); // NOI18N
+        jLabel11.setFont(new java.awt.Font("Segoe UI Symbol", 1, 24)); // NOI18N
         jLabel11.setForeground(new java.awt.Color(255, 204, 51));
         jLabel11.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         jLabel11.setText("DÍAS");
         jLabel11.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
         jLabel11.setHorizontalTextPosition(javax.swing.SwingConstants.LEADING);
-        jPanel6.add(jLabel11, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 10, 40, 50));
+        jPanel6.add(jLabel11, new org.netbeans.lib.awtextra.AbsoluteConstraints(50, 10, 60, 50));
 
         lunes1.setBackground(new java.awt.Color(1, 45, 75));
-        lunes1.setFont(new java.awt.Font("Segoe UI Light", 1, 14)); // NOI18N
+        lunes1.setFont(new java.awt.Font("Segoe UI Light", 1, 18)); // NOI18N
         lunes1.setForeground(new java.awt.Color(255, 255, 255));
         lunes1.setText("Lunes");
         lunes1.setBorder(null);
@@ -374,10 +377,10 @@ public class editarHorario extends javax.swing.JFrame {
                 lunes1ActionPerformed(evt);
             }
         });
-        jPanel6.add(lunes1, new org.netbeans.lib.awtextra.AbsoluteConstraints(70, 10, 70, -1));
+        jPanel6.add(lunes1, new org.netbeans.lib.awtextra.AbsoluteConstraints(130, 10, 90, -1));
 
         martes1.setBackground(new java.awt.Color(1, 45, 75));
-        martes1.setFont(new java.awt.Font("Segoe UI Light", 1, 14)); // NOI18N
+        martes1.setFont(new java.awt.Font("Segoe UI Light", 1, 18)); // NOI18N
         martes1.setForeground(new java.awt.Color(255, 255, 255));
         martes1.setText("Martes");
         martes1.setBorder(null);
@@ -389,10 +392,10 @@ public class editarHorario extends javax.swing.JFrame {
                 martes1ActionPerformed(evt);
             }
         });
-        jPanel6.add(martes1, new org.netbeans.lib.awtextra.AbsoluteConstraints(150, 10, 90, -1));
+        jPanel6.add(martes1, new org.netbeans.lib.awtextra.AbsoluteConstraints(240, 10, 90, -1));
 
         miercoles1.setBackground(new java.awt.Color(1, 45, 75));
-        miercoles1.setFont(new java.awt.Font("Segoe UI Light", 1, 14)); // NOI18N
+        miercoles1.setFont(new java.awt.Font("Segoe UI Light", 1, 18)); // NOI18N
         miercoles1.setForeground(new java.awt.Color(255, 255, 255));
         miercoles1.setText("Miércoles");
         miercoles1.setBorder(null);
@@ -404,10 +407,10 @@ public class editarHorario extends javax.swing.JFrame {
                 miercoles1ActionPerformed(evt);
             }
         });
-        jPanel6.add(miercoles1, new org.netbeans.lib.awtextra.AbsoluteConstraints(250, 10, 90, -1));
+        jPanel6.add(miercoles1, new org.netbeans.lib.awtextra.AbsoluteConstraints(350, 10, 110, -1));
 
         jueves1.setBackground(new java.awt.Color(1, 45, 75));
-        jueves1.setFont(new java.awt.Font("Segoe UI Light", 1, 14)); // NOI18N
+        jueves1.setFont(new java.awt.Font("Segoe UI Light", 1, 18)); // NOI18N
         jueves1.setForeground(new java.awt.Color(255, 255, 255));
         jueves1.setText("Jueves");
         jueves1.setBorder(null);
@@ -419,10 +422,10 @@ public class editarHorario extends javax.swing.JFrame {
                 jueves1ActionPerformed(evt);
             }
         });
-        jPanel6.add(jueves1, new org.netbeans.lib.awtextra.AbsoluteConstraints(350, 10, 80, -1));
+        jPanel6.add(jueves1, new org.netbeans.lib.awtextra.AbsoluteConstraints(480, 10, 100, -1));
 
         viernes1.setBackground(new java.awt.Color(1, 45, 75));
-        viernes1.setFont(new java.awt.Font("Segoe UI Light", 1, 14)); // NOI18N
+        viernes1.setFont(new java.awt.Font("Segoe UI Light", 1, 18)); // NOI18N
         viernes1.setForeground(new java.awt.Color(255, 255, 255));
         viernes1.setText("Viernes");
         viernes1.setBorder(null);
@@ -434,10 +437,10 @@ public class editarHorario extends javax.swing.JFrame {
                 viernes1ActionPerformed(evt);
             }
         });
-        jPanel6.add(viernes1, new org.netbeans.lib.awtextra.AbsoluteConstraints(70, 40, 80, -1));
+        jPanel6.add(viernes1, new org.netbeans.lib.awtextra.AbsoluteConstraints(130, 40, 100, -1));
 
         sabado1.setBackground(new java.awt.Color(1, 45, 75));
-        sabado1.setFont(new java.awt.Font("Segoe UI Light", 1, 14)); // NOI18N
+        sabado1.setFont(new java.awt.Font("Segoe UI Light", 1, 18)); // NOI18N
         sabado1.setForeground(new java.awt.Color(255, 255, 255));
         sabado1.setText("Sábado");
         sabado1.setBorder(null);
@@ -449,10 +452,10 @@ public class editarHorario extends javax.swing.JFrame {
                 sabado1ActionPerformed(evt);
             }
         });
-        jPanel6.add(sabado1, new org.netbeans.lib.awtextra.AbsoluteConstraints(150, 40, 80, -1));
+        jPanel6.add(sabado1, new org.netbeans.lib.awtextra.AbsoluteConstraints(240, 40, 100, -1));
 
         domingo1.setBackground(new java.awt.Color(1, 45, 75));
-        domingo1.setFont(new java.awt.Font("Segoe UI Light", 1, 14)); // NOI18N
+        domingo1.setFont(new java.awt.Font("Segoe UI Light", 1, 18)); // NOI18N
         domingo1.setForeground(new java.awt.Color(255, 255, 255));
         domingo1.setText("Domingo");
         domingo1.setBorder(null);
@@ -464,13 +467,12 @@ public class editarHorario extends javax.swing.JFrame {
                 domingo1ActionPerformed(evt);
             }
         });
-        jPanel6.add(domingo1, new org.netbeans.lib.awtextra.AbsoluteConstraints(250, 40, 90, -1));
+        jPanel6.add(domingo1, new org.netbeans.lib.awtextra.AbsoluteConstraints(350, 40, 110, -1));
 
         jButton6.setBackground(new java.awt.Color(255, 204, 51));
         jButton6.setFont(new java.awt.Font("Segoe UI Light", 1, 14)); // NOI18N
-        jButton6.setForeground(new java.awt.Color(0, 0, 0));
         jButton6.setIcon(new javax.swing.ImageIcon(getClass().getResource("/img/salvar.png"))); // NOI18N
-        jButton6.setText("GUARDAR");
+        jButton6.setText("GUARDAR CAMBIOS");
         jButton6.setBorder(null);
         jButton6.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
         jButton6.setFocusPainted(false);
@@ -480,10 +482,10 @@ public class editarHorario extends javax.swing.JFrame {
                 jButton6ActionPerformed(evt);
             }
         });
-        jPanel6.add(jButton6, new org.netbeans.lib.awtextra.AbsoluteConstraints(150, 70, 160, 40));
+        jPanel6.add(jButton6, new org.netbeans.lib.awtextra.AbsoluteConstraints(220, 150, 220, 40));
 
         allCheck1.setBackground(new java.awt.Color(1, 45, 75));
-        allCheck1.setFont(new java.awt.Font("Segoe UI Light", 1, 14)); // NOI18N
+        allCheck1.setFont(new java.awt.Font("Segoe UI Light", 1, 18)); // NOI18N
         allCheck1.setForeground(new java.awt.Color(255, 255, 255));
         allCheck1.setText("Todos");
         allCheck1.setBorder(null);
@@ -495,9 +497,43 @@ public class editarHorario extends javax.swing.JFrame {
                 allCheck1ActionPerformed(evt);
             }
         });
-        jPanel6.add(allCheck1, new org.netbeans.lib.awtextra.AbsoluteConstraints(350, 40, 70, -1));
+        jPanel6.add(allCheck1, new org.netbeans.lib.awtextra.AbsoluteConstraints(480, 40, 90, -1));
 
-        getContentPane().add(jPanel6, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 240, 460, 120));
+        lbNombre.setBackground(new java.awt.Color(15, 65, 98));
+        lbNombre.setFont(new java.awt.Font("Segoe UI Light", 1, 18)); // NOI18N
+        lbNombre.setForeground(new java.awt.Color(255, 255, 255));
+        lbNombre.setHorizontalAlignment(javax.swing.JTextField.CENTER);
+        lbNombre.setBorder(null);
+        lbNombre.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                lbNombreActionPerformed(evt);
+            }
+        });
+        lbNombre.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyReleased(java.awt.event.KeyEvent evt) {
+                lbNombreKeyReleased(evt);
+            }
+            public void keyTyped(java.awt.event.KeyEvent evt) {
+                lbNombreKeyTyped(evt);
+            }
+        });
+        jPanel6.add(lbNombre, new org.netbeans.lib.awtextra.AbsoluteConstraints(130, 90, 450, 50));
+
+        jLabel3.setBackground(new java.awt.Color(255, 255, 255));
+        jLabel3.setFont(new java.awt.Font("Segoe UI Symbol", 1, 24)); // NOI18N
+        jLabel3.setForeground(new java.awt.Color(255, 204, 51));
+        jLabel3.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        jLabel3.setText("NOMBRE");
+        jLabel3.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
+        jLabel3.setHorizontalTextPosition(javax.swing.SwingConstants.LEADING);
+        jPanel6.add(jLabel3, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 90, 120, 50));
+
+        jSeparator6.setBackground(new java.awt.Color(255, 204, 51));
+        jSeparator6.setForeground(new java.awt.Color(255, 204, 51));
+        jSeparator6.setOrientation(javax.swing.SwingConstants.VERTICAL);
+        jPanel6.add(jSeparator6, new org.netbeans.lib.awtextra.AbsoluteConstraints(120, 90, 10, 50));
+
+        getContentPane().add(jPanel6, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 270, 620, 200));
 
         pack();
         setLocationRelativeTo(null);
@@ -556,14 +592,19 @@ public class editarHorario extends javax.swing.JFrame {
     }//GEN-LAST:event_domingo1ActionPerformed
 
     private void jButton6ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton6ActionPerformed
-        guardarDias();
-        if(HR.getHoras().len()>0){
-            if(HR.getDias().len()>0){
-                frame.recibirEdit(HR);
-                limpiar();
-                setVisible(false);
-            } else mensaje("UPS!", "Debe seleccionar días para este horario.", JOptionPane.WARNING_MESSAGE);
-        } else mensaje("UPS!", "No puede dejar el horario sin horas.", JOptionPane.WARNING_MESSAGE);
+        try {
+            guardarDias();
+            if(HR.getHoras().len()>0){
+                if(HR.getDias().len()>0){
+                    HR.setNombre(lbNombre.getText());
+                    frame.recibirEdit(HR);
+                    limpiar();
+                    setVisible(false);
+                } else mensaje("UPS!", "Debe seleccionar días para este horario.", JOptionPane.WARNING_MESSAGE);
+            } else mensaje("UPS!", "No puede dejar el horario sin horas.", JOptionPane.WARNING_MESSAGE);
+        } catch (Exception e) {
+            mensaje("ERROR", "Ha ocurrido un error: "+ e.getMessage(), JOptionPane.ERROR_MESSAGE);
+        }
     }//GEN-LAST:event_jButton6ActionPerformed
 
     private void jSlider2StateChanged(javax.swing.event.ChangeEvent evt) {//GEN-FIRST:event_jSlider2StateChanged
@@ -616,6 +657,10 @@ public class editarHorario extends javax.swing.JFrame {
         if(p!=-1){
             HR.getHoras().remove(p);
             listarTiempos();
+            if(!listEdit.isEmpty()){
+                jList2.setSelectedIndex(listEdit.getSize()-1);
+                pos = listEdit.getSize()-1;
+            }
         } else {
             mensaje("UPS!", "No hay un tiempo seleccionado.", JOptionPane.WARNING_MESSAGE);
         }
@@ -633,6 +678,18 @@ public class editarHorario extends javax.swing.JFrame {
         }
     }//GEN-LAST:event_nDuracion1ActionPerformed
 
+    private void lbNombreActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_lbNombreActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_lbNombreActionPerformed
+
+    private void lbNombreKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_lbNombreKeyReleased
+        // TODO add your handling code here:
+    }//GEN-LAST:event_lbNombreKeyReleased
+
+    private void lbNombreKeyTyped(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_lbNombreKeyTyped
+        // TODO add your handling code here:
+    }//GEN-LAST:event_lbNombreKeyTyped
+
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JCheckBox addCheck;
@@ -646,17 +703,20 @@ public class editarHorario extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel11;
     private javax.swing.JLabel jLabel12;
     private javax.swing.JLabel jLabel13;
+    private javax.swing.JLabel jLabel3;
     private javax.swing.JList<String> jList2;
     private javax.swing.JPanel jPanel5;
     private javax.swing.JPanel jPanel6;
     private javax.swing.JScrollPane jScrollPane4;
     private javax.swing.JSeparator jSeparator4;
     private javax.swing.JSeparator jSeparator5;
+    private javax.swing.JSeparator jSeparator6;
     private javax.swing.JSlider jSlider1;
     private javax.swing.JSlider jSlider2;
     private javax.swing.JCheckBox jueves1;
     private javax.swing.JLabel lbHora;
     private javax.swing.JLabel lbMin;
+    private javax.swing.JTextField lbNombre;
     private javax.swing.JPopupMenu listaMenu;
     private javax.swing.JCheckBox lunes1;
     private javax.swing.JCheckBox martes1;

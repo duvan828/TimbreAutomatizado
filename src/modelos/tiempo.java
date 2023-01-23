@@ -67,6 +67,6 @@ public class tiempo {
        if(momento==0) mom = "AM";
        else mom = "PM";
        
-        return h+":"+m+mom+" ("+repeticiones+","+duracion+")";
+        return h+":"+m+mom+" Toques: "+repeticiones+", Tiempo(s): "+duracion;
     }
 }
