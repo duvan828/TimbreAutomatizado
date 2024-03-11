@@ -108,7 +108,7 @@
   </NonVisualComponents>
   <Properties>
     <Property name="defaultCloseOperation" type="int" value="3"/>
-    <Property name="title" type="java.lang.String" value="Timbre Autom&#xe1;tico 1.0.0v"/>
+    <Property name="title" type="java.lang.String" value="Timbre Autom&#xe1;tico"/>
     <Property name="resizable" type="boolean" value="false"/>
   </Properties>
   <SyntheticProperties>

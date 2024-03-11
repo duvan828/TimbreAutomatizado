@@ -3,10 +3,15 @@
     <editor-bookmarks xmlns="http://www.netbeans.org/ns/editor-bookmarks/2" lastBookmarkId="0"/>
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
         <group>
-            <file>file:/C:/Users/USUARIO/Documents/NetbeansProjects/timbreAutomatico/src/vistas/Ventana.java</file>
-            <file>file:/C:/Users/USUARIO/Documents/NetbeansProjects/timbreAutomatico/src/vistas/editarHorario.java</file>
-            <file>file:/C:/Users/USUARIO/Documents/NetbeansProjects/timbreAutomatico/build.xml</file>
-            <file>file:/C:/Users/USUARIO/Documents/NetbeansProjects/timbreAutomatico/src/contror/controlador.java</file>
+            <file>file:/C:/Users/Lenovo/Documents/NetBeansProjects/timbreAutomatico/src/vistas/editarHorario.java</file>
+            <file>file:/C:/Users/Lenovo/Documents/NetBeansProjects/timbreAutomatico/src/contror/controlador.java</file>
+            <file>file:/C:/Users/Lenovo/Documents/NetBeansProjects/timbreAutomatico/src/modelos/horario.java</file>
+            <file>file:/C:/Users/Lenovo/Documents/NetBeansProjects/timbreAutomatico/src/listas/listaHorarios.java</file>
+            <file>file:/C:/Users/Lenovo/Documents/NetBeansProjects/timbreAutomatico/src/listas/listaTiempos.java</file>
+            <file>file:/C:/Users/Lenovo/Documents/NetBeansProjects/timbreAutomatico/src/vistas/Ventana.java</file>
+            <file>file:/C:/Users/Lenovo/Documents/NetBeansProjects/timbreAutomatico/build.xml</file>
+            <file>file:/C:/Users/Lenovo/Documents/NetBeansProjects/timbreAutomatico/src/modelos/tiempo.java</file>
+            <file>file:/C:/Users/Lenovo/Documents/NetBeansProjects/timbreAutomatico/src/listas/listaDias.java</file>
         </group>
     </open-files>
 </project-private>

@@ -104,6 +104,7 @@ public class Ventana extends javax.swing.JFrame {
         control.editHorario(h);
         cargarDatos();
         listarHorarios();
+        listarHorarioEdit(h);
     }
     
     private void guardarTiempo(){
@@ -166,6 +167,19 @@ public class Ventana extends javax.swing.JFrame {
     
     private void listarHorario(int ps){
         horario obj  = horarios.get(ps);
+        tableColumn.setHeaderValue(obj.getDias().mostrar());
+        tableHeader.repaint();
+        tbHr.setRowCount(obj.getHoras().len());
+        lbId.setText(obj.getId()+"");
+        lbLenHoras.setText(obj.getHoras().len()+"");
+        lbLenDias.setText(obj.getDias().len()+"");
+        for (int i = 0; i < obj.getHoras().len(); i++) {
+            tbHr.setValueAt((i+1)+". "+obj.getHoras().get(i).toString(), i, 0);
+        }
+    }
+    
+    private void listarHorarioEdit(horario h){
+        horario obj  = h;
         tableColumn.setHeaderValue(obj.getDias().mostrar());
         tableHeader.repaint();
         tbHr.setRowCount(obj.getHoras().len());
@@ -509,7 +523,7 @@ public class Ventana extends javax.swing.JFrame {
         jLabel7.setText("Duración:");
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
-        setTitle("Timbre Automático 1.0.0v");
+        setTitle("Timbre Automático");
         setResizable(false);
         getContentPane().setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
